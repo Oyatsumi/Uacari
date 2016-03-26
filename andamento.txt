@@ -1,0 +1,4 @@
+
+Andamento, OK até agora:
+1- Classe imagem, pacote image
+2- Início das medidas de similaridade - mean difference
