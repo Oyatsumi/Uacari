@@ -2,12 +2,14 @@ package image;
 
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -65,6 +67,15 @@ public class Image implements ImageConstants{
 	 */
 	public Image(int width, int height, int numBands){
 		pixMap = new PixelMap(width, height, numBands, 8);
+		this.bands = (byte) numBands;
+	}
+	/**
+	 * @param width
+	 * @param height
+	 * @throws Exception 
+	 */
+	public Image(int width, int height, int numBands, int bitDepth){
+		pixMap = new PixelMap(width, height, numBands, bitDepth);
 		this.bands = (byte) numBands;
 	}
 	/**
@@ -164,7 +175,7 @@ public class Image implements ImageConstants{
 	
 
 	private ArrayList<TreeMap<Double,Integer>> getHistogram(){
-		if (!this.updateHistogram) return (ArrayList<TreeMap<Double, Integer>>) intensities;
+		if (!this.updateHistogram && intensities != null) return (ArrayList<TreeMap<Double, Integer>>) intensities;
 
 		intensities = new ArrayList<TreeMap<Double, Integer>>(this.getNumBands());
 		for (int k=0; k<this.getNumBands(); k++) intensities.add(new TreeMap<Double, Integer>());
@@ -291,7 +302,11 @@ public class Image implements ImageConstants{
 				bd = bd.add(BigDecimal.valueOf(this.getPixel(j, i, band)));
 			}
 		}
-		bd = bd.divide(BigDecimal.valueOf(this.getWidth()*this.getHeight()));
+		try{
+			bd = bd.divide(BigDecimal.valueOf(this.getWidth()*this.getHeight()));
+		}catch(Exception e){
+			bd = bd.divide(BigDecimal.valueOf(this.getWidth()*this.getHeight()), 2, RoundingMode.HALF_UP); //not exact divisions
+		}
 		this.updateMean = false;
 		this.meanBandBuffer = (byte) band;
 		this.mean = bd.doubleValue();
@@ -561,6 +576,25 @@ public class Image implements ImageConstants{
 	}
 	
 	
+	/**
+	 * Transforms this image in a subimage, starting at position (x, y), with width and height as set in the parameters.
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	public Image subImage(int x, int y, int width, int height){
+		if (width > this.getWidth() - x) width = this.getWidth() - x; if (height > this.getHeight() - y) height = this.getHeight() - y;
+		Image out = new Image(width, height, this.getNumBands(), this.getBitDepth());
+		for (int i=0; i<height; i++)
+			for (int j=0; j<width; j++)
+				for (int b=0; b<out.getNumBands(); b++)
+					out.setPixel(j, i, b, this.getPixel(j + x, i + y, b));
+		this.set(out);
+		return this;
+	}
+	
 	//transforms
 	private Vector auxVec1 = new Vector(0, 0), auxVec2 = new Vector(0, 0);
 	public Image translate(int x, int y) throws Exception{op.translate(x, y); return this;}
@@ -572,6 +606,18 @@ public class Image implements ImageConstants{
 	//
 	public Image drawLine(int x1, int y1, int x2, int y2, Color lineColor) throws Exception{auxVec1.x = x1; auxVec1.y = y1; auxVec2.x = x2; auxVec2.y = y2; op.drawLine(auxVec1, auxVec2, lineColor); return this;}
 	public Image drawLine(Vector p1, Vector p2, Color lineColor) throws Exception{op.drawLine(p1, p2, lineColor); return this;}
+	public Image drawRectangle(int x, int y, int width, int height, Color color) throws Exception{op.drawRectangle(x, y, width, height, color); return this;}
+	public Image drawRectangleOutline(int x, int y, int width, int height, Color color) throws Exception{op.drawRectangleOutline(x, y, width, height, color); return this;}
+	/**
+	 * Renders the text of the specified String, using the current text attribute state in the Graphics2D context. The baseline of the first character is at position (x, y) in the User Space.
+	 * @param x
+	 * @param y
+	 * @param str
+	 * @param color
+	 * @return
+	 * @throws Exception
+	 */
+	public Image drawString(int x, int y, String str, Color color, Font font) throws Exception{op.drawString(x, y, str, color, font); return this;}
 	public Image blendImages(Image topImg, int posX, int posY) throws Exception{op.blendImages(topImg.getBufferedImage(), posX, posY); return this;}
 	public Image invert(){op.invert(); return this;}
 	public Image intersect(Image imgToIntersect){op.intersect(imgToIntersect); return this;}

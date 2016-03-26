@@ -7,7 +7,8 @@ public abstract class SimilarityMeasure {
 	public static final SimilarityMeasure MEAN_DIFFERENCE = new MeanDifference(1), SUM_OF_DIFFERENCES = new SumOfDifferences(1),
 			HAUSDORFF_DISTANCE = new HausdorffDistance(Distance.EUCLIDEAN_DISTANCE), NORMALIZED_CROSS_CORRELATION = new NormalizedCrossCorrelation(),
 			MUTUAL_INFORMATION = new MutualInformation("2"), INTERSECTION = new Intersection(), HYBRID_SUM_OF_DIFFERENCES = new HybridSumOfDifferences(3, 0),
-			DICE_INDEX = new DiceIndex(0), CHAMFER_DISTANCE = new ChamferDistance(0, Distance.EUCLIDEAN_DISTANCE);
+			DICE_INDEX = new DiceIndex(0), CHAMFER_DISTANCE = new ChamferDistance(2, Distance.EUCLIDEAN_DISTANCE), WEIGHTED_MUTUAL_INFORMATION = new WeightedMutualInformation("2"),
+			WEIGHTED_MUTUAL_INFORMATION2 = new WeightedMutualInformation2("2");
 	
 	
 	protected boolean boost = true;

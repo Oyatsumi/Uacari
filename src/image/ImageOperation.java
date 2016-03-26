@@ -2,6 +2,7 @@ package image;
 
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
@@ -112,6 +113,47 @@ public class ImageOperation implements ImageConstants {
 		associatedImg.updateImage(outBuffImg);
 		return outBuffImg;
 	}
+	
+	public BufferedImage drawRectangle(int x, int y, int width, int height, Color c) throws Exception{
+		outBuffImg = new BufferedImage(associatedImg.getWidth(), associatedImg.getHeight(), associatedImg.getType());
+		g2d = outBuffImg.createGraphics();
+		setRenderingKeys(g2d);
+		g2d.drawImage(associatedImg.getBufferedImage(), null, 0, 0);
+		g2d.setColor(c);
+		g2d.fillRect(x, y, width, height);
+		//g2d.drawRect(x, y, width, height);
+		g2d.dispose();
+		associatedImg.updateImage(outBuffImg);
+		return outBuffImg;
+	}
+	
+	public BufferedImage drawRectangleOutline(int x, int y, int width, int height, Color c) throws Exception{
+		outBuffImg = new BufferedImage(associatedImg.getWidth(), associatedImg.getHeight(), associatedImg.getType());
+		g2d = outBuffImg.createGraphics();
+		setRenderingKeys(g2d);
+		g2d.drawImage(associatedImg.getBufferedImage(), null, 0, 0);
+		g2d.setColor(c);
+		//g2d.fillRect(x, y, width, height);
+		g2d.drawRect(x, y, width, height);
+		g2d.dispose();
+		associatedImg.updateImage(outBuffImg);
+		return outBuffImg;
+	}
+	
+	public BufferedImage drawString(int x, int y, String str, Color c, Font f) throws Exception{
+		outBuffImg = new BufferedImage(associatedImg.getWidth(), associatedImg.getHeight(), associatedImg.getType());
+		g2d = outBuffImg.createGraphics();
+		setRenderingKeys(g2d);
+		g2d.drawImage(associatedImg.getBufferedImage(), null, 0, 0);
+		g2d.setColor(c);
+		if (f != null) g2d.setFont(f);
+		g2d.drawString(str, x, y);
+		g2d.dispose();
+		associatedImg.updateImage(outBuffImg);
+		return outBuffImg;
+	}
+	
+	
 	
 	public BufferedImage blendImages(BufferedImage topImg, int x, int y) throws Exception{return blendImages(topImg, new Point2D.Float(x, y));}
 	public BufferedImage blendImages(BufferedImage topImg, Vector topImgPosition) throws Exception{
@@ -241,7 +283,7 @@ public class ImageOperation implements ImageConstants {
 		for (int i=0; i<associatedImg.getHeight(); i++){
 			for (int j=0; j<associatedImg.getWidth(); j++){
 				for (int b=0; b<associatedImg.getNumBands(); b++){
-					if (!(associatedImg.getPixel(j, i, b) > lowerThresholdLevel && associatedImg.getPixel(j, i, b) < upperThresholdLevel))
+					if (!(associatedImg.getPixel(j, i, b) > lowerThresholdLevel && associatedImg.getPixel(j, i, b) <= upperThresholdLevel))
 						associatedImg.setPixel(j, i, b, lowerValue);
 				}
 			}

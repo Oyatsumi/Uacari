@@ -6,13 +6,15 @@ import java.util.Map.Entry;
 import image.Image;
 
 /**
- * A weighted mutual information combing the mutual information and mean difference measures. More details on: http://www.cmpbjournal.com/article/S0169-2607(15)00244-8/abstract
+ * A weighted mutual information combing the mutual information and mean difference measures. 
+ * More details on: http://www.cmpbjournal.com/article/S0169-2607(15)00244-8/abstract , be advised that the WMI equation in this paper is inverted (the higher the better). 
+ * Here, the lower the better.
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
 public class WeightedMutualInformation extends SimilarityMeasure {
 
 	private String logBase = "2";
-	protected boolean weighted = true;
+	protected boolean weighted = true, weight2 = false /*tirar dps*/;
 	
 	public WeightedMutualInformation(String logBase){
 		this.logBase = logBase;
@@ -95,9 +97,12 @@ public class WeightedMutualInformation extends SimilarityMeasure {
 				for (Entry<Double, Double> moving : movingOccurrence.entrySet()){
 					if (mutualOccurrence.get(fixed.getKey()).containsKey(moving.getKey())){
 						double weight = 1;
-						if (weighted)
-							weight = (double) 1/(Math.abs(moving.getKey() - fixed.getKey())+1);
+						if (weight2)
+							weight = (double) (Math.abs(moving.getKey() - fixed.getKey()));
+						else if (weighted)
+							weight = (double) 1/(Math.abs(moving.getKey() - fixed.getKey()) + 1);
 						result = mutualOccurrence.get(fixed.getKey()).get(moving.getKey())/(double)(width*height);
+						if (result == 0) System.out.println("bla");
 						resultAux = (double)result/( ((fixedOccurrence.get(fixed.getKey()))/(double)(width*height))
 								* (movingOccurrence.get(moving.getKey())/(double)(width*height)) );
 						if (logBase.equals("e"))

@@ -7,15 +7,17 @@ import image.Image;
  * Implements a mutual information measure. The lower the better.
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
-public class MutualInformation extends WeightedMutualInformation{
+public class WeightedMutualInformation2 extends WeightedMutualInformation{
 	
 
-	public MutualInformation(String logBase){
+	public WeightedMutualInformation2(String logBase){
 		super(logBase);
 		this.weighted = false;
+		this.weight2 = true;
 	}
-	public MutualInformation(Image img1, Image img2, String logBase){
+	public WeightedMutualInformation2(Image img1, Image img2, String logBase){
 		super(img1, img2, logBase);
+		this.weight2 = true;
 		this.weighted = false;
 	}
 	
