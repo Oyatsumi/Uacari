@@ -28,7 +28,7 @@ public class NormalizedCrossCorrelation extends SimilarityMeasure{
 	public double compare(Image img1, Image img2, int band) {
 		final int bandI = (band == ALL_BANDS) ? 0 : band, bandF = (band == ALL_BANDS) ? Math.min(img1.getNumBands(), img2.getNumBands()) : band + 1;
 		final int width = Math.min(img1.getWidth(), img2.getWidth()), height = Math.min(img1.getHeight(), img2.getHeight());
-		if (this.isBoosted()){//for commonplace images
+		if (this.fastComputation()){//for commonplace images
 			double numerator = 0, denominator1 = 0, denominator2 = 0;
 			double img1MeanIntensity = 0, img2MeanIntensity = 0;
 			double result = 0;
@@ -68,6 +68,14 @@ public class NormalizedCrossCorrelation extends SimilarityMeasure{
 			
 			return result.divide(BigDecimal.valueOf(bandF)).doubleValue();
 		}
+	}
+	@Override
+	public String getName() {
+		return "Normalized Cross Correlation";
+	}
+	@Override
+	public boolean increasesIfBetter() {
+		return true;
 	}
 	
 	

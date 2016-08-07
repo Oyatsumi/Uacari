@@ -29,4 +29,6 @@ public class MeanDifference extends SumOfDifferences{
 	}
 	
 	
+	@Override
+	public String getName(){return "Mean Difference";}
 }

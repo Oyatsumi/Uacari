@@ -1,4 +1,4 @@
-package distances;
+package similarity.distances;
 
 public interface Distance {
 	public static final Distance EUCLIDEAN_DISTANCE = new EuclideanDistance(2), MANHATTAN_DISTANCE = new ManhattanDistance(), 

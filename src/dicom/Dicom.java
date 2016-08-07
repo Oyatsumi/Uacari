@@ -23,7 +23,7 @@ import image.Vector;
  * Accesses DICOM data that is converted to a XML-file, respecting the
  *  data format distributed by dcm4che library website as the binary 'dcm2xml'
  *  This class requires further optimization, however, it works. One possible optimization is to stop working with text files and to work directly with
- *  the binary DICOM files.
+ *  the binary DICOM files. We generate a XML file from the DICOM using a third party library and read the data from the generated file (slow).
  *  
  *  @author Érick Oliveira Rodrigues (erickr@id.uff.br).
  */

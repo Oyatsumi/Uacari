@@ -37,5 +37,8 @@ public class WeightedMutualInformation2 extends WeightedMutualInformation{
 		return super.compare(img1, img2, band);
 	}
 	
+	@Override
+	public String getName(){return "Weighted Mutual Information 2";}
+	
 
 }

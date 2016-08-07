@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 public class ImageOperation implements ImageConstants {
 
-	
+	private static volatile boolean firstTime = true;
 	private BufferedImage outBuffImg = null;
 	private Graphics2D g2d = null;
 	
@@ -27,6 +27,9 @@ public class ImageOperation implements ImageConstants {
 	
 	public ImageOperation(Image associatedImage){
 		this.associatedImg = associatedImage;
+		try{
+			if (firstTime) {System.setProperty("sun.java2d.opengl","True"); firstTime = false;} //enabling opengl
+		}catch (Exception e){};
 	}
 	public void setImage(Image associatedImg){this.associatedImg = associatedImg;}
 
@@ -88,6 +91,27 @@ public class ImageOperation implements ImageConstants {
 		associatedImg.updateImage(outBuffImg);
 		return outBuffImg;
 	}
+	public BufferedImage rotate(double theta, boolean translateToOrigin) throws Exception{
+		//convert to degrees
+		theta = 1.57*theta/90;
+		//
+		outBuffImg = new BufferedImage((int)(associatedImg.getWidth()), (int)(associatedImg.getHeight()), associatedImg.getType());
+		
+		g2d = outBuffImg.createGraphics();
+		setRenderingKeys(g2d);
+		if (translateToOrigin)
+			g2d.rotate(theta, associatedImg.getWidth()/2, associatedImg.getHeight()/2);
+		else
+			g2d.rotate(theta);
+		g2d.drawImage(associatedImg.getBufferedImage(), null, 0, 0);
+		g2d.dispose();
+		
+		//if (translateToOrigin)
+		//	outBuffImg = this.translate(associatedImg.getWidth()/2, associatedImg.getHeight()/2);
+		
+		associatedImg.updateImage(outBuffImg);
+		return outBuffImg;
+	}
 	public BufferedImage transform(AffineTransform t/*, Object interpolation*/) throws Exception{
 		outBuffImg = new BufferedImage(associatedImg.getWidth(), associatedImg.getHeight(), associatedImg.getType());
 		g2d = outBuffImg.createGraphics();
@@ -145,7 +169,8 @@ public class ImageOperation implements ImageConstants {
 		g2d = outBuffImg.createGraphics();
 		setRenderingKeys(g2d);
 		g2d.drawImage(associatedImg.getBufferedImage(), null, 0, 0);
-		g2d.setColor(c);
+		if (c != null) g2d.setColor(c);
+		else g2d.setColor(Color.YELLOW);
 		if (f != null) g2d.setFont(f);
 		g2d.drawString(str, x, y);
 		g2d.dispose();

@@ -54,7 +54,7 @@ public class HybridSumOfDifferences extends SimilarityMeasure {
 	public double compare(Image img1, Image img2, int band) {
 		final int bandI = (band == ALL_BANDS) ? 0 : band, bandF = (band == ALL_BANDS) ? Math.min(img1.getNumBands(), img2.getNumBands()) : band + 1;
 		final int width = Math.min(img1.getWidth(), img2.getWidth()), height = Math.min(img1.getHeight(), img2.getHeight());
-		if (this.isBoosted()){//for commonplace images
+		if (this.fastComputation()){//for commonplace images
 			double img1MaxIntensity = 0, img2MaxIntensity = 0;
 
 			long fScore = 0, fCounter = 1;
@@ -127,6 +127,16 @@ public class HybridSumOfDifferences extends SimilarityMeasure {
 			
 			return fScore.divide(BigDecimal.valueOf(bandF)).doubleValue();
 		}
+	}
+
+	@Override
+	public String getName() {
+		return "Hybrid Sum Of Differences";
+	}
+
+	@Override
+	public boolean increasesIfBetter() {
+		return false;
 	}
 
 	

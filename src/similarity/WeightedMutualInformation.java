@@ -102,7 +102,6 @@ public class WeightedMutualInformation extends SimilarityMeasure {
 						else if (weighted)
 							weight = (double) 1/(Math.abs(moving.getKey() - fixed.getKey()) + 1);
 						result = mutualOccurrence.get(fixed.getKey()).get(moving.getKey())/(double)(width*height);
-						if (result == 0) System.out.println("bla");
 						resultAux = (double)result/( ((fixedOccurrence.get(fixed.getKey()))/(double)(width*height))
 								* (movingOccurrence.get(moving.getKey())/(double)(width*height)) );
 						if (logBase.equals("e"))
@@ -119,6 +118,14 @@ public class WeightedMutualInformation extends SimilarityMeasure {
 		}
 
 		return mutualInf/(double)bandF;
+	}
+	@Override
+	public String getName() {
+		return "Weighted Mutual Information";
+	}
+	@Override
+	public boolean increasesIfBetter() {
+		return true;
 	}
 	
 	

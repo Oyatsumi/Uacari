@@ -36,4 +36,6 @@ public class MutualInformation extends WeightedMutualInformation{
 	}
 	
 
+	@Override
+	public String getName(){return "Mutual Information";}
 }

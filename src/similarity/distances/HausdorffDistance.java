@@ -1,8 +1,8 @@
-package similarity;
+package similarity.distances;
 
 
-import distances.Distance;
 import image.Image;
+import similarity.SimilarityMeasure;
 
 /**
  * A class implementing the Hausdorff distance. Brute force, which is very slow. Works with binary images only.
@@ -102,6 +102,15 @@ public class HausdorffDistance extends SimilarityMeasure{
 			sumBands += Math.max(max1, max2);
 		}
 		return sumBands/(float)bandF;
+	}
+	
+	@Override
+	public String getName() {
+		return null;
+	}
+	@Override
+	public boolean increasesIfBetter() {
+		return false;
 	}
 	
 	

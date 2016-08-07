@@ -1,12 +1,12 @@
-package similarity;
+package similarity.distances;
 
 import java.math.BigDecimal;
 
-import distances.Distance;
 import image.Image;
+import similarity.SimilarityMeasure;
 
 /**
- * Class to compute the Chamfer Distance. It is mainly used with binary images, but we have implemented it to work with grey images as well.
+ * Class to compute the Chamfer Distance. It is mainly used with binary images, but we have made it to work with grey images as well.
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
 public class ChamferDistance extends SimilarityMeasure {
@@ -39,7 +39,7 @@ public class ChamferDistance extends SimilarityMeasure {
 	public double compare(Image img1, Image img2, int band) {
 		final int bandI = (band == ALL_BANDS) ? 0 : band, bandF = (band == ALL_BANDS) ? Math.min(img1.getNumBands(), img2.getNumBands()) : band + 1;
 		final int width = Math.min(img1.getWidth(), img2.getWidth()), height = Math.min(img1.getHeight(), img2.getHeight());
-		if (this.isBoosted()){//for commonplace images
+		if (this.fastComputation()){//for commonplace images
 			double total = 0; int it = 1; boolean reachedEnd = false, outBoundary = false;
 			for (int b=bandI; b<bandF; b++){
 				double min = Long.MAX_VALUE, compD = 0;
@@ -128,6 +128,14 @@ public class ChamferDistance extends SimilarityMeasure {
 			}
 			return total.divide(BigDecimal.valueOf(bandF)).doubleValue();
 		}
+	}
+	@Override
+	public String getName() {
+		return "Chamfer Distance";
+	}
+	@Override
+	public boolean increasesIfBetter() {
+		return false;
 	}
 
 }

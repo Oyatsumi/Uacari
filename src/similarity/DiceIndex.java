@@ -48,7 +48,7 @@ public class DiceIndex extends SimilarityMeasure{
 	public double compare(Image img1, Image img2, int band) {
 		final int bandI = (band == ALL_BANDS) ? 0 : band, bandF = (band == ALL_BANDS) ? Math.min(img1.getNumBands(), img2.getNumBands()) : band + 1;
 		final int width = Math.min(img1.getWidth(), img2.getWidth()), height = Math.min(img1.getHeight(), img2.getHeight());
-		if (this.isBoosted()){//for commonplace images
+		if (this.fastComputation()){//for commonplace images
 			long sum = 0;
 			for (int b=bandI; b<bandF; b++){
 				int nS = 0;
@@ -81,5 +81,13 @@ public class DiceIndex extends SimilarityMeasure{
 			}
 			return sum.divide(BigDecimal.valueOf(bandF)).doubleValue();
 		}
+	}
+	@Override
+	public String getName() {
+		return "Dice Index";
+	}
+	@Override
+	public boolean increasesIfBetter() {
+		return true;
 	}
 }

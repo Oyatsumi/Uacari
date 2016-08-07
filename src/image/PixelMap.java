@@ -5,27 +5,41 @@ class PixelMap {
 	private PixelData[] layers = null;
 	private int bitDepth = 0;
 	private int width, height;
+	private boolean floatValues = false;
 	
-	PixelMap(int width, int height, int numBands, int bitDepth){
+	PixelMap(int width, int height, int numBands, int bitDepth, boolean floatValues){
 		this.bitDepth = bitDepth;
 		this.width = width; this.height = height;
 		layers = new PixelData[numBands];
-		if (bitDepth == 1){
-			for (int b=0; b<numBands; b++)
-				layers[b] = new BooleanPixelData(width, height);
+		this.floatValues = floatValues;
+		if (floatValues){
+			if (bitDepth <= 32){
+				for (int b=0; b<numBands; b++)
+					layers[b] = new FloatPixelData(width, height);
+			}
+			else if (bitDepth <= 64){
+				for (int b=0; b<numBands; b++)
+					layers[b] = new DoublePixelData(width, height);
+			}
+		}else{
+			if (bitDepth == 1){
+				for (int b=0; b<numBands; b++)
+					layers[b] = new BooleanPixelData(width, height);
+			}
+			else if (bitDepth <= 8){
+				for (int b=0; b<numBands; b++)
+					layers[b] = new BytePixelData(width, height);
+			}
+			else if (bitDepth <= 16){
+				for (int b=0; b<numBands; b++)
+					layers[b] = new ShortPixelData(width, height);
+			}
+			else if (bitDepth <= 32){
+				for (int b=0; b<numBands; b++)
+					layers[b] = new IntegerPixelData(width, height);
+			}
 		}
-		else if (bitDepth <= 8){
-			for (int b=0; b<numBands; b++)
-				layers[b] = new ShortPixelData(width, height);
-		}
-		else if (bitDepth <= 32){
-			for (int b=0; b<numBands; b++)
-				layers[b] = new IntegerPixelData(width, height);
-		}
-		else if (bitDepth <= 64){
-			for (int b=0; b<numBands; b++)
-				layers[b] = new DoublePixelData(width, height);
-		}
+
 	}
 	
 	//get
@@ -58,23 +72,37 @@ class PixelMap {
 	public void setPixelData(short[][] pData, int band){
 		((ShortPixelData)layers[band]).pixelData = pData;
 	}
+	public void setPixelData(byte[][] pData, int band){
+		((BytePixelData)layers[band]).pixelData = pData;
+	}
 	public void setPixelData(boolean[][] pData, int band){
 		((BooleanPixelData)layers[band]).pixelData = pData;
+	}
+	public void setPixelData(float[][] pData, int band){
+		((FloatPixelData)layers[band]).pixelData = pData;
 	}
 	public void setPixelData(double[][] pData, int band){
 		((DoublePixelData)layers[band]).pixelData = pData;
 	}
 	public void setPixelData(PixelData pData, int band, int bitDepth){
-		if (bitDepth == 1)
-			setPixelData(((BooleanPixelData)pData).pixelData, band);
-		else if (bitDepth <= 8)
-			setPixelData(((ShortPixelData)pData).pixelData, band);
-		else if (bitDepth <= 32)
-			setPixelData(((IntegerPixelData)pData).pixelData, band);
-		else if (bitDepth <= 64)
-			setPixelData(((DoublePixelData)pData).pixelData, band);
+		if (floatValues){
+			if (bitDepth <= 32)
+				setPixelData(((IntegerPixelData)pData).pixelData, band);
+			else if (bitDepth <= 64)
+				setPixelData(((DoublePixelData)pData).pixelData, band);
+		}else{
+			if (bitDepth == 1)
+				setPixelData(((BooleanPixelData)pData).pixelData, band);
+			else if (bitDepth <= 8)
+				setPixelData(((BytePixelData)pData).pixelData, band);
+			else if (bitDepth <= 16)
+				setPixelData(((ShortPixelData)pData).pixelData, band);
+			else if (bitDepth <= 32)
+				setPixelData(((IntegerPixelData)pData).pixelData, band);
+		}
 	}
 	
+	public boolean containsFloatValues(){return floatValues;}
 	
 	
 	abstract class PixelData{
@@ -113,20 +141,50 @@ class PixelMap {
 		}
 		
 	}
-	private class ShortPixelData extends PixelData{
-		short[][] pixelData;
-		final static short SHIFT = 128;
+	/**
+	 * Byte images cannot receive negative values!!! Just short or higher ones are able to do this.
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	private class BytePixelData extends PixelData{
+		byte[][] pixelData;
+		final static byte SHIFT = Byte.MIN_VALUE;
 		
-		ShortPixelData(int width, int height){pixelData = new short[height][width]; for (int i=0; i<pixelData.length; i++) for (int j=0; j<pixelData[0].length; j++) pixelData[i][j] = -SHIFT;}
+		BytePixelData(int width, int height){pixelData = new byte[height][width]; for (int i=0; i<pixelData.length; i++) for (int j=0; j<pixelData[0].length; j++) pixelData[i][j] = SHIFT;}
 		
 		@Override
 		public double get(int x, int y) {
-			return pixelData[y][x] + SHIFT;
+			return pixelData[y][x] - SHIFT;
 		}
 
 		@Override
 		public void set(int x, int y, double value) {
-			pixelData[y][x] = (short) (value - SHIFT);
+			pixelData[y][x] = (byte) (value + SHIFT);
+		}
+		
+		@Override
+		public PixelData clone() {
+			BytePixelData n = new BytePixelData(this.pixelData[0].length, this.pixelData.length);
+			for (int i=0; i<pixelData.length; i++)
+				for (int j=0; j<pixelData[0].length; j++)
+					n.set(j, i, this.get(j, i));					
+			return n;
+		}
+
+	}
+	private class ShortPixelData extends PixelData{
+		short[][] pixelData;
+		//final static short SHIFT = 128;
+		
+		ShortPixelData(int width, int height){pixelData = new short[height][width]; }
+		
+		@Override
+		public double get(int x, int y) {
+			return pixelData[y][x];
+		}
+
+		@Override
+		public void set(int x, int y, double value) {
+			pixelData[y][x] = (short) (value);
 		}
 		
 		@Override
@@ -162,6 +220,31 @@ class PixelMap {
 					n.set(j, i, this.get(j, i));					
 			return n;
 		}
+	}
+	private class FloatPixelData extends PixelData{
+		float[][] pixelData;
+		
+		FloatPixelData(int width, int height){pixelData = new float[height][width];}
+		
+		@Override
+		public double get(int x, int y) {
+			return pixelData[y][x];
+		}
+
+		@Override
+		public void set(int x, int y, double value) {
+			pixelData[y][x] = (float) value;
+		}
+		
+		@Override
+		public PixelData clone() {
+			FloatPixelData n = new FloatPixelData(this.pixelData[0].length, this.pixelData.length);
+			for (int i=0; i<pixelData.length; i++)
+				for (int j=0; j<pixelData[0].length; j++)
+					n.set(j, i, this.get(j, i));					
+			return n;
+		}
+		
 	}
 	private class DoublePixelData extends PixelData{
 		double[][] pixelData;

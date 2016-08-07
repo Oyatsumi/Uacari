@@ -9,14 +9,18 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
+import javax.swing.filechooser.FileSystemView;
 
+import filters.Filter;
 import morphology.Morphology;
 import similarity.SimilarityMeasure;
 
@@ -38,44 +42,45 @@ public class Image implements ImageConstants{
 	//
 	private ImageOperation op = new ImageOperation(this); //low memory instance
 	private ImageDisplay display = null;
-	private Morphology m = new Morphology(this);
+	private Morphology morphology = null;
+	//
+	private double[] backgroundColor = null;
 	
 	//auxiliary variables
 	private WritableRaster raster = null;
 	
+	private void instantiateMorphology(){if (morphology == null) morphology = new Morphology(this);}
+	
 	public Image set(Image img){
-		pixMap = new PixelMap(img.getWidth(), img.getHeight(), img.getNumBands(), img.getBitDepth());
+		pixMap = new PixelMap(img.getWidth(), img.getHeight(), img.getNumBands(), img.getBitDepth(), img.containsFloatValues());
 		for (int b=0; b<img.getNumBands(); b++){
-			if (img.getBitDepth() == 1)
-				pixMap.setPixelData(img.pixMap.getPixelData(b).clone(), b, 1);
-			else if (img.getBitDepth() <= 8)
-				pixMap.setPixelData(img.pixMap.getPixelData(b).clone(), b, 8);
-			else if (img.getBitDepth() <= 32)
-				pixMap.setPixelData(img.pixMap.getPixelData(b).clone(), b, 32);
-			else if (img.getBitDepth() <= 64)
-				pixMap.setPixelData(img.pixMap.getPixelData(b).clone(), b, 64);
+			pixMap.setPixelData(img.pixMap.getPixelData(b).clone(), b, img.getBitDepth());
 		}
 		this.type = img.getType();
 		this.bands = (byte) img.getNumBands();
+		updateBuffered = true; updateHistogram = true; updateMean = true;
+		display = null; morphology = null; bImg = null; intensities = null;
 		return this;
 	}
 
 	/**
+	 * Creates a 8-bits depth image
 	 * @param width
 	 * @param height
 	 * @throws Exception 
 	 */
 	public Image(int width, int height, int numBands){
-		pixMap = new PixelMap(width, height, numBands, 8);
+		pixMap = new PixelMap(width, height, numBands, 8, false);
 		this.bands = (byte) numBands;
 	}
-	/**
-	 * @param width
-	 * @param height
-	 * @throws Exception 
-	 */
+
 	public Image(int width, int height, int numBands, int bitDepth){
-		pixMap = new PixelMap(width, height, numBands, bitDepth);
+		pixMap = new PixelMap(width, height, numBands, bitDepth, false);
+		this.bands = (byte) numBands;
+	}
+
+	public Image(int width, int height, int numBands, int bitDepth, boolean canAssumeFloatValues){
+		pixMap = new PixelMap(width, height, numBands, bitDepth, canAssumeFloatValues);
 		this.bands = (byte) numBands;
 	}
 	/**
@@ -83,7 +88,7 @@ public class Image implements ImageConstants{
 	 * @param img - input matrix
 	 */
 	public Image(int[][] img){
-		pixMap = new PixelMap(img[0].length, img.length, 1, 32);
+		pixMap = new PixelMap(img[0].length, img.length, 1, 32, false);
 		pixMap.setPixelData(img, 0);
 	}
 	/**
@@ -92,22 +97,29 @@ public class Image implements ImageConstants{
 	 * @param height - height of the image
 	 */
 	public Image(int width, int height){
-		pixMap = new PixelMap(width, height, 1, 8);
+		pixMap = new PixelMap(width, height, 1, 8, false);
 	}
 	/**
-	 * Creates a new image that is 8-bits depth with the values of the matrix img
+	 * Creates a new image that is 16-bits depth with the values of the matrix img
 	 * @param img - input matrix
 	 */
 	public Image(short[][] img){
-		pixMap = new PixelMap(img[0].length, img.length, 1, 8);
+		pixMap = new PixelMap(img[0].length, img.length, 1, 16, false);
+		pixMap.setPixelData(img, 0);
+	}
+	/**
+	 * Creates a new image that is 8-bits depth (from 0 to 255) with the values of the matrix img
+	 * @param img - input matrix
+	 */
+	public Image(byte[][] img){
+		pixMap = new PixelMap(img[0].length, img.length, 1, 8, false);
 		pixMap.setPixelData(img, 0);
 	}
 	/**
 	 * Clones a image of type Image, creates a new object that is identical to the previous image but is a different object
 	 * @param img - the image to be cloned
-	 * @throws CloneNotSupportedException 
 	 */
-	public Image(Image img) throws CloneNotSupportedException{
+	public Image(Image img){
 		this.set(img);
 	}
 	/**
@@ -135,6 +147,7 @@ public class Image implements ImageConstants{
 			return;
 		}
 		
+		
 		for (int i=0; i<this.getHeight(); i++){
 			for (int j=0; j<this.getWidth(); j++){
 				for (int b=0; b<raster.getNumBands() && b < this.getNumBands(); b++){
@@ -142,12 +155,21 @@ public class Image implements ImageConstants{
 				}
 			}
 		}
+		
 		this.setToUpdateBuffers();
-		this.updateBuffered = false;
 	}
 
 	
-
+	/**
+	 * Applis a filer passed as parameter to the current image.
+	 * @param filter
+	 * @return
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public Image applyFilter(Filter filter){
+		this.set(filter.apply(this));
+		return this;
+	}
 
 	public void resize(int width, int height) throws Exception{
 		if (!this.hasBufferedImage()){//if there is no bufferedImage
@@ -196,6 +218,39 @@ public class Image implements ImageConstants{
 	
 	
 	//get
+	/**
+	 * Returns the pixel at position (x,y).
+	 * If the position is out of the image boundaries, then return the background color if set, otherwise returns 0 on that position.
+	 * @return
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public double getPixelBoundaryMode(int x, int y){
+		if (x < 0 || y < 0 || x >= this.getWidth() || y >= this.getHeight()){
+			if (this.backgroundColor != null){
+				return this.backgroundColor[0];
+			}else
+				return 0;
+		}
+		return this.pixMap.get(x, y);
+	}
+	/**
+	 * Returns the pixel at position (x,y).
+	 * If the position is out of the image boundaries, then return the background color if set, otherwise returns 0 on that position.
+	 * @param x
+	 * @param y
+	 * @param band
+	 * @return
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public double getPixelBoundaryMode(int x, int y, int band){
+		if (x < 0 || y < 0 || x >= this.getWidth() || y >= this.getHeight()){
+			if (this.backgroundColor != null){
+				return this.backgroundColor[band];
+			}else
+				return 0;
+		}
+		return this.pixMap.get(x, y);
+	}
 	public double getPixel(int x, int y){
 		return this.pixMap.get(x, y);
 	}
@@ -290,6 +345,7 @@ public class Image implements ImageConstants{
 		return this.getMinMaxIntensity(band).y;
 	}
 	public int getBitDepth(){return this.pixMap.getBitDepth();}//acertar dps
+	public boolean containsFloatValues(){return this.pixMap.containsFloatValues();}
 	private int getAssociatedNumBands(int imgType){return (imgType == BufferedImage.TYPE_BYTE_GRAY) ? 1 : (imgType == BufferedImage.TYPE_INT_RGB) ? 3 : 4;}
 	private int getAssociatedType(int numBands){return (numBands == 1) ? BufferedImage.TYPE_BYTE_GRAY : (numBands == 3) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;}
 	double mean = 0;
@@ -319,7 +375,8 @@ public class Image implements ImageConstants{
 	 * @throws Exception 
 	 */
 	public Image clusterImage() throws Exception{
-		return this.set(m.cluster(this, Morphology.PRIMARY_STRUCT));
+		instantiateMorphology();
+		return this.set(morphology.cluster(this, Morphology.PRIMARY_STRUCT));
 	}
 	/**
 	 * Converts a binary image to an grey image, where at every white pixel the image receives the index of the pixel.
@@ -385,7 +442,7 @@ public class Image implements ImageConstants{
 	
 	public Image convertToGray() throws Exception{return convertToGray(8);}
 	public Image convertToGray(int bitDepth) throws Exception{
-		PixelMap pm = new PixelMap(this.getWidth(), this.getHeight(), 1, bitDepth);
+		PixelMap pm = new PixelMap(this.getWidth(), this.getHeight(), 1, bitDepth, false);
 		for (int i=0; i<this.getHeight(); i++){
 			for (int j=0; j<this.getWidth(); j++){
 				pm.set(j, i, this.getPixel(j, i, 0));
@@ -399,7 +456,7 @@ public class Image implements ImageConstants{
 		return this;
 	}
 	public Image convertToBinary(float threshold) throws Exception{
-		PixelMap pm = new PixelMap(this.getWidth(), this.getHeight(), 1, 1);
+		PixelMap pm = new PixelMap(this.getWidth(), this.getHeight(), 1, 1, false);
 		for (int i=0; i<this.getHeight(); i++){
 			for (int j=0; j<this.getWidth(); j++){
 				pm.set(j, i, this.getPixel(j, i, 0) >= threshold ? 255 : 0);
@@ -418,11 +475,14 @@ public class Image implements ImageConstants{
 	 * @param interpolationType - the types can be Image.BICUBIC, Image.BILINEAR or Image.NEAREST_NEIGHBOR
 	 */
 	public void setInterpolation(Object interpolationType){this.op.setInterpolation(interpolationType);}
-	public void setConfiguration(int numBands, int bitDepth) throws Exception{ //TERMINAR
+	public void setConfiguration(int numBands, int bitDepth) throws Exception{setConfiguration(numBands, 8, false);}
+	public void setConfiguration(int numBands) throws Exception{setConfiguration(numBands, 8, false);}
+	public void setConfiguration(int numBands, int bitDepth, boolean containsFloatValues) throws Exception{ //TERMINAR
+		if (bitDepth < 32 && containsFloatValues){System.out.printf("The minimum bit-depth for float values is 32, resetting it to 32.\n");}
 		PixelMap pMap = this.pixMap;
 		this.bands = (byte) numBands;
 		this.type = getAssociatedType(bitDepth / 8);
-		this.pixMap = new PixelMap(this.getWidth(), this.getHeight(), numBands, bitDepth);
+		this.pixMap = new PixelMap(this.getWidth(), this.getHeight(), numBands, bitDepth, containsFloatValues);
 		for (int i=0; i<this.getHeight(); i++){
 			for (int j=0; j<this.getWidth(); j++){
 				for (int b=0; b<numBands; b++){
@@ -458,10 +518,11 @@ public class Image implements ImageConstants{
 					if (b >= 1) grey &= raster.getSample(j, i, b) == raster.getSample(j, i, b-1);
 			}
 		}
+		
 		if (!grey)
-			pixMap = new PixelMap(img.getWidth(), img.getHeight(), raster.getNumBands(), 8);
+			pixMap = new PixelMap(img.getWidth(), img.getHeight(), raster.getNumBands(), 8, false);
 		else
-			pixMap = new PixelMap(img.getWidth(), img.getHeight(), 1, 8);
+			pixMap = new PixelMap(img.getWidth(), img.getHeight(), 1, 8, false);
 		
 		for (int i=0; i<img.getHeight(); i++){
 			for (int j=0; j<img.getWidth(); j++){
@@ -480,6 +541,14 @@ public class Image implements ImageConstants{
 		raster = null;
 	}
 	
+	public void setBackgroundColor(double[] bgColor){this.backgroundColor = bgColor;}
+	public void setBackgroundColor(double value, int numOfBands){
+		this.backgroundColor = new double[numOfBands];
+		for (int k=0; k<numOfBands; k++){
+			this.backgroundColor[k] = value;
+		}
+	}
+	
 
 	
 	//is
@@ -494,7 +563,7 @@ public class Image implements ImageConstants{
 	public void disposeBufferedImage(){this.bImg = null;}
 	
 	
-	public Image clone() throws CloneNotSupportedException{
+	public Image clone() {
 		return new Image(this);
 	}
 	
@@ -542,8 +611,40 @@ public class Image implements ImageConstants{
 		}
 	}
 	
+	/**
+	 * Saves the image on the path provided and with the format provided (png, jpg, etc)
+	 * @param outputPath
+	 * @param formatName
+	 * @throws Exception
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void exportImage(String outputPath, String formatName) throws Exception{
 		ImageIO.write(this.getBufferedImage(), formatName.toUpperCase(), new File(outputPath));
+	}
+	
+	/**
+	 * Saves the image as png on the path provided
+	 * @param outputPath
+	 * @throws Exception
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public void exportImage(String outputPath) throws Exception{
+		ImageIO.write(this.getBufferedImage(), "PNG", new File(outputPath));
+	}
+	
+	/**
+	 * Saves the image as png in a standard folder
+	 * @throws Exception
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public void exportImage() throws Exception{
+		File home = FileSystemView.getFileSystemView().getHomeDirectory(),
+				newFolder = new File(home.getAbsolutePath() + "/Uacari/");
+		SecureRandom random = new SecureRandom();
+		String output = newFolder.getAbsolutePath() + "/" + new BigInteger(80, random).toString(32) + ".png";
+
+		System.out.printf("The images are being exported to the folder: " + output);
+		exportImage(output);
 	}
 	
 	
@@ -586,7 +687,7 @@ public class Image implements ImageConstants{
 	 */
 	public Image subImage(int x, int y, int width, int height){
 		if (width > this.getWidth() - x) width = this.getWidth() - x; if (height > this.getHeight() - y) height = this.getHeight() - y;
-		Image out = new Image(width, height, this.getNumBands(), this.getBitDepth());
+		Image out = new Image(width, height, this.getNumBands(), this.getBitDepth(), this.containsFloatValues());
 		for (int i=0; i<height; i++)
 			for (int j=0; j<width; j++)
 				for (int b=0; b<out.getNumBands(); b++)
@@ -601,7 +702,8 @@ public class Image implements ImageConstants{
 	public Image scale(double x, double y) throws Exception{op.scale(x, y); return this;}
 	public Image scaleWithFixedSize(double x, double y) throws Exception{op.scaleWithFixedSize(x, y); return this;}
 	public Image transform(AffineTransform at) throws Exception{op.transform(at); return this;}
-
+	public Image rotate(double theta)throws Exception{op.rotate(theta, true); return this;}
+	public Image rotateWithoutCentralizing(double theta)throws Exception{op.rotate(theta, false); return this;}
 	
 	//
 	public Image drawLine(int x1, int y1, int x2, int y2, Color lineColor) throws Exception{auxVec1.x = x1; auxVec1.y = y1; auxVec2.x = x2; auxVec2.y = y2; op.drawLine(auxVec1, auxVec2, lineColor); return this;}
@@ -617,6 +719,7 @@ public class Image implements ImageConstants{
 	 * @return
 	 * @throws Exception
 	 */
+	public Image drawString(int x, int y, String str) throws Exception{op.drawString(x, y, str, null, null); return this;}
 	public Image drawString(int x, int y, String str, Color color, Font font) throws Exception{op.drawString(x, y, str, color, font); return this;}
 	public Image blendImages(Image topImg, int posX, int posY) throws Exception{op.blendImages(topImg.getBufferedImage(), posX, posY); return this;}
 	public Image invert(){op.invert(); return this;}

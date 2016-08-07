@@ -44,5 +44,13 @@ public class Intersection extends SimilarityMeasure {
 		}
 		return sum/(double)bandF;
 	}
+	@Override
+	public String getName() {
+		return "Intersection";
+	}
+	@Override
+	public boolean increasesIfBetter() {
+		return true;
+	}
 
 }

@@ -1,7 +1,9 @@
 package similarity;
 
-import distances.Distance;
 import image.Image;
+import similarity.distances.ChamferDistance;
+import similarity.distances.Distance;
+import similarity.distances.HausdorffDistance;
 
 public abstract class SimilarityMeasure {
 	public static final SimilarityMeasure MEAN_DIFFERENCE = new MeanDifference(1), SUM_OF_DIFFERENCES = new SumOfDifferences(1),
@@ -39,10 +41,10 @@ public abstract class SimilarityMeasure {
 	 */
 	public void setBoost(boolean activate){this.boost = activate;}
 	
-	public boolean isBoosted(){return boost;}
+	public boolean fastComputation(){return boost;}
 	
 	/**
-	 * Compares the images img1 and img2, regarding just the 'band' passed as parameter
+	 * Compares images img1 and img2, regarding just the 'band' passed as parameter
 	 * @param img1
 	 * @param img2
 	 * @param band
@@ -50,7 +52,7 @@ public abstract class SimilarityMeasure {
 	 */
 	public abstract double compare(Image img1, Image img2, int band);
 	/**
-	 * Compares the images img1 and img2, regarding all bands
+	 * Compares images img1 and img2, regarding all bands
 	 * @param img1
 	 * @param img2
 	 * @return
@@ -59,15 +61,49 @@ public abstract class SimilarityMeasure {
 		return compare(img1, img2, ALL_BANDS);
 	}
 	
+	/**
+	 * Compares img1 and img2, with the result unified so that the lower the value returned by this function the better, no matter which
+	 * similarity is regarded
+	 * @param img1
+	 * @param img2
+	 * @return
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public double compareUnified(Image img1, Image img2){
+		if (increasesIfBetter()) return Long.MAX_VALUE - compare(img1, img2);
+		else return compare(img1, img2);
+	}
+
+	/**
+	 * Compares img1 and img2, with the result unified so that the lower the value returned by this function the better, no matter which
+	 * similarity is regarded
+	 * @param img1
+	 * @param img2
+	 * @param band
+	 * @return
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public double compareUnified(Image img1, Image img2, int band){
+		if (increasesIfBetter()) return Long.MAX_VALUE - compare(img1, img2, band);
+		else return compare(img1, img2, band);
+	}
+	
 	public double compare() throws Exception{
 		if (img1 == null || img2 == null) throw new Exception("One or both of the images is/are null. Please set them with the method setImages(img1, img2) before using compare.");
 		else return compare(this.img1, this.img2);
+	}
+	public double compareUnified() throws Exception{
+		if (img1 == null || img2 == null) throw new Exception("One or both of the images is/are null. Please set them with the method setImages(img1, img2) before using compare.");
+		else return compareUnified(this.img1, this.img2);
 	}
 	public double compare(int band) throws Exception{
 		if (img1 == null || img2 == null) throw new Exception("One or both of the images is/are null. Please set them with the method setImages(img1, img2) before using compare.");
 		else return compare(this.img1, this.img2, band);
 	}
-	
+	public double compareUnified(int band) throws Exception{
+		if (img1 == null || img2 == null) throw new Exception("One or both of the images is/are null. Please set them with the method setImages(img1, img2) before using compare.");
+		else return compareUnified(this.img1, this.img2, band);
+	}
 
 	/**
 	 * Checks if the images are equal or not according to a set threshold regarding all bands (all bands are compared).
@@ -106,4 +142,13 @@ public abstract class SimilarityMeasure {
 		else return isEqual(this.img1, this.img2, threshold);
 	}
 	
+	
+	public abstract String getName();
+	/**
+	 * Returns false if it is a measure like Mean Differences, Hausdorff Distance, etc, where the lower the number returned the better
+	 * and returns true otherwise
+	 * @return
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public abstract boolean increasesIfBetter();
 }

@@ -20,18 +20,18 @@ public class ImageDisplay extends JFrame{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private final Panel p = new Panel(this);
+	private final Panel panel = new Panel(this);
 	
 	ImageDisplay(){
 		this.setLayout(new BorderLayout());
-	    this.add(p, BorderLayout.CENTER);
+	    this.add(panel, BorderLayout.CENTER);
 	    this.setSize(500, 400);
 	    this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
-	public void setImage(BufferedImage img){p.setImage(img); this.setVisible(true);}
+	public void setImage(BufferedImage img){panel.setImage(img); this.setVisible(true);}
 	public void setImage(Image img) throws Exception{
-		p.setImage(img); 
+		panel.setImage(img); 
 		if (img.getHeight() < 600 && img.getWidth() < 600)
 			this.setSize(img.getWidth(), img.getHeight());
 		else{
