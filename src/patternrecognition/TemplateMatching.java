@@ -1,16 +1,12 @@
 package patternrecognition;
 
-import image.Image;
 import similarity.MeanDifference;
 import similarity.SimilarityMeasure;
+import general.Image;
 
 
 
 
-/**
- * Still needs to be finished.
- * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
- */
 public class TemplateMatching{
 	private Image reference = null, template = null, referenceWindow = null;
 	private SimilarityMeasure similarityMeasure = new MeanDifference(1);

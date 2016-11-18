@@ -1,12 +1,5 @@
 package dicom;
 
-/**
-
- * 
- * Part of the {@link Dicom} class
- * 
- *  @author Érick Oliveira Rodrigues (erickr@id.uff.br).
- */
 public class PixelDataMap {
 	private PixelData rawpixeldata;
 	
