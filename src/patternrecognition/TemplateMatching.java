@@ -1,12 +1,16 @@
 package patternrecognition;
 
+import image.Image;
 import similarity.MeanDifference;
 import similarity.SimilarityMeasure;
-import general.Image;
 
 
 
 
+/**
+ * Still needs to be finished.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class TemplateMatching{
 	private Image reference = null, template = null, referenceWindow = null;
 	private SimilarityMeasure similarityMeasure = new MeanDifference(1);
@@ -22,7 +26,7 @@ public class TemplateMatching{
 		this.templateX = x;
 		this.templateY = y;
 		referenceWindow = new Image(template.getWidth(), template.getHeight());
-		int pixelValue = 0;
+		double pixelValue = 0;
 		for (int i=0; i<template.getHeight(); i++){
 			nextColumn:
 			for (int j=0; j<template.getWidth(); j++){

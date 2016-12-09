@@ -1,40 +1,34 @@
 package similarity;
 
-import java.math.BigDecimal;
+import image.Image;
 
-import general.Image;
-
-public class MeanDifference implements SimilarityMeasure{
-	private float g = 1;
-	private boolean boost = false;
-
-	public MeanDifference(float expoentParameter){
-		this.g = expoentParameter;
+/**
+ * Class implementing a simple mean difference measure. Works for binary and grey images.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
+public class MeanDifference extends SumOfDifferences{
+	
+	public MeanDifference(float expoentParameter) {
+		super(expoentParameter);
 	}
+	public MeanDifference(Image img1, Image img2, float expoentParameter){
+		super(img1, img2, expoentParameter);
+	}
+
+
+
+	/* (non-Javadoc)
+	 * Assumes the images are of the same size
+	 * @see similarity.SimilarityMeasure#compare(image.Image, image.Image)
+	 */
+	@Override
+	public double compare(Image img1, Image img2, int band) {
+		final int bandF = (band == ALL_BANDS) ? Math.min(img1.getNumBands(), img2.getNumBands()) : band + 1;
+		final int width = Math.min(img1.getWidth(), img2.getWidth()), height = Math.min(img1.getHeight(), img2.getHeight());
+		return super.compare(img1, img2, band)/((double)width*height*bandF);
+	}
+	
 	
 	@Override
-	public int getSimilarityMeasureIndex() {
-		return SimilarityMeasure.MEAN_DIFFERENCE;
-	}
-
-	@Override
-	public double compare(Image img1, Image img2){
-		if (this.boost)
-			return SumOfDifferences.fastSumOfDifferences(img1, img2, this.g)/(img2.getHeight()*img2.getWidth());
-		else{
-			BigDecimal bd = SumOfDifferences.sumOfDifferences(img1, img2, this.g);
-			bd = bd.divide(BigDecimal.valueOf(img2.getHeight()*img2.getWidth()));
-			return bd.doubleValue();
-		}
-	}
-
-	//set
-	public void setExpoentParameter(float parameter){
-		this.g = parameter;
-	}
-	public void setSpeedUp(boolean activate){this.boost = activate;}
-
-	
-	
-	
+	public String getName(){return "Mean Difference";}
 }
