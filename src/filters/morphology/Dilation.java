@@ -2,16 +2,15 @@ package filters.morphology;
 
 import filters.Filter;
 import image.Image;
-import log.Logger;
 import morphology.Morphology;
+import morphology.MorphologyConstants;
 
-import static morphology.Morphology.*;
 
-public class Dilation extends Filter{
+public class Dilation extends Filter implements MorphologyConstants{
 	private int timesToDilate = 2;
 	
 	private Morphology morphology = null;
-	private Image structuringElement = FILLED_RING_STRUCT;
+	private Image structuringElement = STRUCT_FILLED_RING;
 	private Image resultImage = null;
 	
 	
@@ -43,12 +42,7 @@ public class Dilation extends Filter{
 		if (morphology == null){
 			morphology = new Morphology();
 			
-			try {
-				resultImage = morphology.dilate(image, structuringElement, timesToDilate);
-			} catch (Exception e) {
-				e.printStackTrace();
-				Logger.logln(e.toString());
-			}
+			resultImage = morphology.dilate(image, structuringElement, timesToDilate);
 			
 		}
 		

@@ -7,15 +7,19 @@ import image.Image;
 import matrices.RunLengthMatrix;
 import similarity.distances.Distance;
 
-public class RunLengthFilter extends Filter{
+interface RunLengthConstants{
+	public static final RunLengthType TYPE_RUN_PERCENTAGE = RunLengthType.TYPE_RUN_PERCENTAGE,
+			TYPE_GREY_LEVEL_NON_UNIFORMITY = RunLengthType.TYPE_GREY_LEVEL_NON_UNIFORMITY;
+	public static enum RunLengthType{ TYPE_RUN_PERCENTAGE, TYPE_GREY_LEVEL_NON_UNIFORMITY;}
+}
+
+public class RunLengthFilter extends Filter implements RunLengthConstants{
 
 	private int kernelSizeX = 7, kernelSizeY = 7;
 	private Distance kernelRadialDistance = CHEBYSHEV_DISTANCE;
 	private int orientation = 0;
 	
-	private int operation = TYPE_GREY_LEVEL_NON_UNIFORMITY;
-	
-	public static final int TYPE_RUN_PERCENTAGE = 0, TYPE_GREY_LEVEL_NON_UNIFORMITY = 1;
+	private RunLengthType operation = TYPE_GREY_LEVEL_NON_UNIFORMITY;
 	
 	public RunLengthFilter(){
 		
@@ -41,13 +45,19 @@ public class RunLengthFilter extends Filter{
 		this.setKernelSize(kernelSize);
 	}
 	
+	public RunLengthFilter(final Image image, final int orientation, final int kernelSize, final RunLengthType operationType){
+		this.setImage(image);
+		this.setOrientation(orientation);
+		this.setKernelSize(kernelSize);
+		this.setOperationType(operationType);
+	}
 	
 	/**
 	 * Sets the equation to be computed from the local co-occurrence matrices.
 	 * @param type
 	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
-	public void setOperationType(final int type){
+	public void setOperationType(final RunLengthType type){
 		this.operation = type;
 	}
 	/**

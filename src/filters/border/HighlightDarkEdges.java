@@ -9,7 +9,7 @@ import log.Logger;
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
 public class HighlightDarkEdges extends GaussianBlur{
-	private double negativeSum = 0;
+	//private double negativeSum = 0;
 	
 	public HighlightDarkEdges(){
 		this.setAmplitude(5);
@@ -19,7 +19,7 @@ public class HighlightDarkEdges extends GaussianBlur{
 	
 	protected void updateKernel(){
 		if (update){
-			negativeSum = 0;
+			//negativeSum = 0;
 			super.supressPrint = true;
 			super.updateKernel();
 			
@@ -32,7 +32,7 @@ public class HighlightDarkEdges extends GaussianBlur{
 					
 					if (!(j == halfX && i == halfY)){
 						kernel[i][j] *= -1;
-						negativeSum += kernel[i][j];
+						//negativeSum += kernel[i][j];
 					}else{
 						//kernelSum += -2*kernel[i][j];
 					}

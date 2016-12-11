@@ -369,7 +369,7 @@ public class ImageOperation {
 	
 	
 	
-	public Image dilateOrErode(Image structElement, boolean dilation) throws IOException, CloneNotSupportedException{
+	public Image dilateOrErode(Image structElement, boolean dilation){
 		Image aux = new Image(associatedImg);
 		
 		double value = 0;

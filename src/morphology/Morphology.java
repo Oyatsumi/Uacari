@@ -1,7 +1,5 @@
 package morphology;
 
-import java.io.IOException;
-
 import image.Image;
 import image.ImageOperation;
 
@@ -9,11 +7,7 @@ import image.ImageOperation;
  * General class for morphology, including dilations, erosions, reconstructions, etc.
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
-public class Morphology {
-	public static final Image PRIMARY_STRUCT = new Image(new short[][]{{0,255,0},{255,255,255},{0,255,0}}),
-			RING_STRUCT = new Image(new short[][]{{0, 0, 0, 255, 255, 255, 255, 0, 0, 0}, {0, 0, 255, 0, 0, 0, 0, 255, 0, 0}, {0, 255, 0, 0, 0, 0, 0, 0, 255, 0}, {255, 0, 0, 0, 0, 0, 0, 0, 0, 255}, {255, 0, 0, 0, 0, 0, 0, 0, 0, 255}, {255, 0, 0, 0, 0, 0, 0, 0, 0, 255}, {255, 0, 0, 0, 0, 0, 0, 0, 0, 255}, {0, 255, 0, 0, 0, 0, 0, 0, 255, 0}, {0, 0, 255, 0, 0, 0, 0, 255, 0, 0}, {0, 0, 0, 255, 255, 255, 255, 0, 0, 0}}),
-			FILLED_RING_STRUCT = new Image(new short[][]{{0, 0, 0, 255, 255, 255, 255, 0, 0, 0}, {0, 0, 255, 255, 255, 255, 255, 255, 0, 0}, {0, 255, 255, 255, 255, 255, 255, 255, 255, 0}, {255, 255, 255, 255, 255, 255, 255, 255, 255, 255}, {255, 255, 255, 255, 255, 255, 255, 255, 255, 255}, {255, 255, 255, 255, 255, 255, 255, 255, 255, 255}, {255, 255, 255, 255, 255, 255, 255, 255, 255, 255}, {0, 255, 255, 255, 255, 255, 255, 255, 255, 0}, {0, 0, 255, 255, 255, 255, 255, 255, 0, 0}, {0, 0, 0, 255, 255, 255, 255, 0, 0, 0}}),
-			SIMPLE_BINARY_RECT = new Image(new short[][]{{1,1,1},{1,1,1},{1,1,1}});
+public class Morphology implements MorphologyConstants{
 	
 	private ImageOperation op = null;
 	private MorphologicalReconstruction mr = null;
@@ -32,7 +26,7 @@ public class Morphology {
 	 * @return
 	 * @throws Exception
 	 */
-	public Image dilate(Image img, Image structuringElement, int timesToDilate) throws Exception {
+	public Image dilate(Image img, Image structuringElement, int timesToDilate) {
 		if (this.op == null) op = new ImageOperation(img);
 		op.setImage(img);
 		Image out = new Image(img);
@@ -47,7 +41,7 @@ public class Morphology {
 	 * @return
 	 * @throws Exception
 	 */
-	public Image erode(Image img, Image structuringElement, int timesToErode) throws Exception {
+	public Image erode(Image img, Image structuringElement, int timesToErode) {
 		if (this.op == null) op = new ImageOperation(img);
 		op.setImage(img);
 		Image out = new Image(img);
@@ -96,7 +90,8 @@ public class Morphology {
 				//se as variáveis i e j não estiverem extrapolando os limites da imagem src e não forem igual às coordenadas do pixel central do structuring element
 				if (j >= 0 && i >=0 && j < src.getWidth() && i < src.getHeight() /*&& !(i == y && j == i)*/){
 					double sub = 0; //subtração
-					double structValue = structElement.getPixel(j-x+tX, i-y+tY, band);
+					int structBand = (structElement.getNumBands() > band ? band : structElement.getNumBands() - 1);
+					double structValue = structElement.getPixel(j-x+tX, i-y+tY, structBand);
 					if (structValue == 255) structValue = max;
 					if (!dilate) sub = src.getPixel(j, i, band) - structValue; //se for pra erosão
 					else sub = (max-structValue) - src.getPixel(j, i, band); //se for pra dilatar

@@ -1,14 +1,14 @@
 package filters.morphology;
 
-import static morphology.Morphology.PRIMARY_STRUCT;
 
 import filters.Filter;
 import image.Image;
+import morphology.MorphologyConstants;
 
-public class Opening extends Filter{
+public class Opening extends Filter implements MorphologyConstants{
 
 	protected Image resultImage = null;
-	private Image structuringElement = PRIMARY_STRUCT;
+	private Image structuringElement = STRUCT_PRIMARY;
 	private int timesToDilate = 3, timesToErode = 3;
 	
 	public void setStructuringElement(final Image structuringElement){

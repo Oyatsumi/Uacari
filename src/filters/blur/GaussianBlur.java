@@ -7,8 +7,8 @@ import log.Logger;
 public class GaussianBlur extends Filter{
 	protected int kernelSizeX = 3, kernelSizeY = 3;
 	protected float amplitude = 0.8f;
-	private float spreadX = 1;
-	private float spreadY = 1;
+	protected float spreadX = 1;
+	protected float spreadY = 1;
 	protected boolean update = true;
 	protected double kernelSum = 0;
 	protected double[][] kernel = null;

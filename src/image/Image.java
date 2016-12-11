@@ -534,7 +534,7 @@ public class Image{
 	 */
 	public Image clusterImage() throws Exception{
 		instantiateMorphology();
-		return this.set(morphology.cluster(this, Morphology.PRIMARY_STRUCT));
+		return this.set(morphology.cluster(this, Morphology.STRUCT_PRIMARY));
 	}
 	/**
 	 * Converts a binary image to an grey image, where at every white pixel the image receives the index of the pixel.
@@ -711,6 +711,8 @@ public class Image{
 		
 		raster = img.getRaster();
 		
+		
+		float opacity = 1;
 		boolean grey = true;
 		for (int i=0; i<img.getHeight() && raster.getNumBands() > 1; i++){
 			for (int j=0; j<img.getWidth(); j++){
@@ -726,13 +728,16 @@ public class Image{
 		
 		for (int i=0; i<img.getHeight(); i++){
 			for (int j=0; j<img.getWidth(); j++){
+				if (raster.getNumBands() == 4) {
+					opacity = raster.getSample(j, i, 3)/255f;
+				}
 				if (grey)
 					//pixMap.set(j, i, (raster.getSample(j, i, 0)));
-					this.setPixel(j, i, (raster.getSample(j, i, 0)));
+					this.setPixel(j, i, (raster.getSample(j, i, 0))*opacity);
 				else{
 					for (int b=0; b<raster.getNumBands(); b++){
 						//pixMap.set(j, i, b, raster.getSampleDouble(j, i, b));
-						this.setPixel(j, i, b, raster.getSampleDouble(j, i, b));
+						this.setPixel(j, i, b, raster.getSampleDouble(j, i, b)*opacity);
 					}
 				}
 			}
@@ -874,8 +879,8 @@ public class Image{
 	 * @throws CloneNotSupportedException
 	 */
 	public Image skeletonize(int times) throws IOException, CloneNotSupportedException{
-		if (this.isBinary()) return this.skeletonize(Morphology.SIMPLE_BINARY_RECT, times);
-		else return this.skeletonize(Morphology.PRIMARY_STRUCT, times);
+		if (this.isBinary()) return this.skeletonize(Morphology.STRUCT_SIMPLE_BINARY_RECT, times);
+		else return this.skeletonize(Morphology.STRUCT_PRIMARY, times);
 	}
 	
 	
@@ -1032,7 +1037,7 @@ public class Image{
 	 * @return - the dilated image
 	 * @throws Exception
 	 */
-	public Image dilate(Image structuringElement, int times, boolean contrast) throws Exception{for (int k=0; k<times; k++) op.dilateOrErode(structuringElement, true); if(contrast) this.contrast(); return this;}
+	public Image dilate(Image structuringElement, int times, boolean contrast) {for (int k=0; k<times; k++) op.dilateOrErode(structuringElement, true); if(contrast) this.contrast(); return this;}
 	/**
 	 * Dilates the image based on the structuring element passed as parameter. You can create a new structuring element or use one of the Morphology class ({@link Morphology}).
 	 * E.g., {@link Morphology.PRIMARY_STRUCT} for grey images, {@link Morphology.SIMPLE_BINARY_RECT} for binary images, etc.
@@ -1042,7 +1047,7 @@ public class Image{
 	 * @return - the dilated image
 	 * @throws Exception
 	 */
-	public Image dilate(Image structuringElement, int times) throws Exception{return dilate(structuringElement, times, true);}
+	public Image dilate(Image structuringElement, int times){return dilate(structuringElement, times, true);}
 	/**
 	 * Erodes the image based on the structuring element passed as parameter. You can create a new structuring element or use one of the Morphology class ({@link Morphology}). .
 	 * E.g., {@link Morphology.PRIMARY_STRUCT} for grey images, {@link Morphology.SIMPLE_BINARY_RECT} for binary images, etc.
@@ -1052,7 +1057,7 @@ public class Image{
 	 * @return - the dilated image
 	 * @throws Exception
 	 */
-	public Image erode(Image structuringElement, int times) throws Exception{return erode(structuringElement, times, true);}
+	public Image erode(Image structuringElement, int times) {return erode(structuringElement, times, true);}
 	/**
 	 * Erodes the image based on the structuring element passed as parameter. You can create a new structuring element or use one of the Morphology class ({@link Morphology}). 
 	 * E.g., {@link Morphology.PRIMARY_STRUCT} for grey images, {@link Morphology.SIMPLE_BINARY_RECT} for binary images, etc.
@@ -1063,7 +1068,7 @@ public class Image{
 	 * @return - the dilated image
 	 * @throws Exception
 	 */
-	public Image erode(Image structuringElement, int times, boolean contrast) throws Exception{for (int k=0; k<times; k++) op.dilateOrErode(structuringElement, false); if(contrast) this.contrast(); return this;}
+	public Image erode(Image structuringElement, int times, boolean contrast) {for (int k=0; k<times; k++) op.dilateOrErode(structuringElement, false); if(contrast) this.contrast(); return this;}
 	
 	
 	

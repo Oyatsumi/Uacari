@@ -1,17 +1,15 @@
 package filters.border;
 
 import filters.blur.GaussianBlur;
-import filters.border.LinearGradient.LinearGradientType;
 import image.Image;
 import log.Logger;
 
-import static filters.border.LinearGradient.LinearGradientType.*;
 
-public class GaussianGradient extends GaussianBlur{
-	private boolean computeXAxis = true, computeYAxis = true;
+public class GaussianGradient extends GaussianBlur implements GradientConstants{
+	protected boolean computeXAxis = true, computeYAxis = true;
 	private boolean supressPrint = false;
 	private double[][] kernelX, kernelY;
-	private LinearGradientType operationType = TYPE_MEAN;
+	private AverageType operationType = TYPE_MEAN;
 	
 	
 	public GaussianGradient(final Image image){

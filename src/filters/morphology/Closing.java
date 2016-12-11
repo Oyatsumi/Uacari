@@ -2,13 +2,12 @@ package filters.morphology;
 
 import filters.Filter;
 import image.Image;
+import morphology.MorphologyConstants;
 
-import static morphology.Morphology.*;
-
-public class Closing extends Filter {
+public class Closing extends Filter implements MorphologyConstants{
 	
 	private Image resultImage = null;
-	private Image structuringElement = PRIMARY_STRUCT;
+	private Image structuringElement = STRUCT_PRIMARY;
 	private int timesToDilate = 3, timesToErode = 3;
 	
 	public void setStructuringElement(final Image structuringElement){

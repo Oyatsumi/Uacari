@@ -1,23 +1,30 @@
 package filters.matrices;
 
 import filters.Filter;
+
 import image.Image;
 import matrices.CoOccurrenceMatrix;
 import similarity.distances.Distance;
 
 import static similarity.distances.Distance.*;
 
-public class CoOccurrenceFilter extends Filter{
+interface CoOccurrenceConstants{
+	public static CoOccurrenceType TYPE_ENERGY = CoOccurrenceType.TYPE_ENERGY, TYPE_CONTRAST = CoOccurrenceType.TYPE_CONTRAST,
+			TYPE_HOMOGENEITY = CoOccurrenceType.TYPE_HOMOGENEITY, TYPE_ENTROPY = CoOccurrenceType.TYPE_ENTROPY, TYPE_MOMENT = CoOccurrenceType.TYPE_MOMENT;
+	public static enum CoOccurrenceType{TYPE_ENERGY, TYPE_CONTRAST, TYPE_HOMOGENEITY, 
+			TYPE_ENTROPY, TYPE_MOMENT;}
+}
+
+public class CoOccurrenceFilter extends Filter implements CoOccurrenceConstants{
 	private int kernelSizeX = 7, kernelSizeY = 7;
 	private Distance kernelRadialDistance = CHEBYSHEV_DISTANCE;
 	private boolean computeBothOrientations = false;
 	public int deltaX = 1, deltaY = 0;
 	private float momentDegree = 2;
 	
-	private int operation = TYPE_ENTROPY;
+	private CoOccurrenceType operation = TYPE_HOMOGENEITY;
 	
-	public static final int TYPE_ENERGY = 0, TYPE_CONTRAST = 1, TYPE_HOMOGENEITY = 2, 
-			TYPE_ENTROPY = 3, TYPE_MOMENT = 4;
+	
 	
 	public CoOccurrenceFilter(){
 		
@@ -26,7 +33,7 @@ public class CoOccurrenceFilter extends Filter{
 		this.setImage(image);
 	}
 
-	public CoOccurrenceFilter(final Image image, final int operationType, final int kernelRadius, final Distance kernelDistanceMeasure, final int deltaX,
+	public CoOccurrenceFilter(final Image image, final CoOccurrenceType operationType, final int kernelRadius, final Distance kernelDistanceMeasure, final int deltaX,
 			final int deltaY){
 		this.setImage(image);
 		this.setOperationType(operationType);
@@ -35,7 +42,7 @@ public class CoOccurrenceFilter extends Filter{
 		this.setDelta(deltaX, deltaY);
 	}
 	
-	public CoOccurrenceFilter(final Image image, final int operationType, final int kernelRadius, final Distance kernelDistanceMeasure, final int deltaX,
+	public CoOccurrenceFilter(final Image image, final CoOccurrenceType operationType, final int kernelRadius, final Distance kernelDistanceMeasure, final int deltaX,
 			final int deltaY, final boolean computeBothOrientations){
 		this.setImage(image);
 		this.setOperationType(operationType);
@@ -45,14 +52,14 @@ public class CoOccurrenceFilter extends Filter{
 		this.setToComputeToBothOrientations(computeBothOrientations);
 	}
 	
-	public CoOccurrenceFilter(final Image image, final int operationType, final int deltaX, final int deltaY){
+	public CoOccurrenceFilter(final Image image, final CoOccurrenceType operationType, final int deltaX, final int deltaY){
 		this.setImage(image);
 		this.setOperationType(operationType);
 		this.setDelta(deltaX, deltaY);
 		this.setToComputeToBothOrientations(computeBothOrientations);
 	}
 	
-	public CoOccurrenceFilter(final Image image, final int operationType, final int kernelSize, final int deltaX, final int deltaY){
+	public CoOccurrenceFilter(final Image image, final CoOccurrenceType operationType, final int kernelSize, final int deltaX, final int deltaY){
 		this.setImage(image);
 		this.setOperationType(operationType);
 		this.setKernelSize(kernelSize);
@@ -60,7 +67,7 @@ public class CoOccurrenceFilter extends Filter{
 		this.setToComputeToBothOrientations(computeBothOrientations);
 	}
 	
-	public CoOccurrenceFilter(final Image image, final int operationType, final int kernelWidth, final int kernelHeight, final int deltaX, final int deltaY){
+	public CoOccurrenceFilter(final Image image, final CoOccurrenceType operationType, final int kernelWidth, final int kernelHeight, final int deltaX, final int deltaY){
 		this.setImage(image);
 		this.setOperationType(operationType);
 		this.setKernelHeight(kernelHeight);
@@ -75,7 +82,7 @@ public class CoOccurrenceFilter extends Filter{
 	 * @param type
 	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
-	public void setOperationType(final int type){
+	public void setOperationType(final CoOccurrenceType type){
 		this.operation = type;
 	}
 	/**
@@ -115,7 +122,7 @@ public class CoOccurrenceFilter extends Filter{
 		
 		for (int i=y - sY; i <= y + sY; i++){
 			for (int j=x - sX; j <= x + sX; j++){
-				neighImage.setPixel(j - x + sX, i - y + sY, band, image.getPixelBoundaryMode(j, i, band));
+				neighImage.setPixel(j - x + sX, i - y + sY, image.getPixelBoundaryMode(j, i, band));
 			}
 		}
 		

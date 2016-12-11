@@ -5,8 +5,8 @@ import image.Image;
 import log.Logger;
 
 public class GaborFilter extends Filter{
-	private int kernelWidth = 20, kernelHeight = 20;
-	private float spreadX = 4f, spreadY = 4f, delta = (float) (0.25f*Math.PI);
+	private int kernelWidth = 10, kernelHeight = 10;
+	private float spreadX = 2f, spreadY = 2f, delta = (float) (0.25f*Math.PI);
 	private double offSet = 0;
 	private double[][] kernel;
 	

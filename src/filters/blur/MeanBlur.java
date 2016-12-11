@@ -8,34 +8,40 @@ import static similarity.distances.Distance.*;
 
 import java.util.ArrayList;
 
-public class MeanBlur extends Filter{
+
+interface MeanBlurConstants {
+	public static enum AverageType{TYPE_ARITHMETIC_MEAN, TYPE_GEOMETRIC_MEAN, TYPE_MEDIAN, TYPE_MAX, TYPE_MIN;}
+	public static final AverageType TYPE_MAX = AverageType.TYPE_MAX, TYPE_ARITHMETIC_MEAN = AverageType.TYPE_ARITHMETIC_MEAN,
+			TYPE_GEOMETRIC_MEAN = AverageType.TYPE_GEOMETRIC_MEAN, TYPE_MEDIAN = AverageType.TYPE_MEDIAN,
+			TYPE_MIN = AverageType.TYPE_MIN;
+}
+
+public class MeanBlur extends Filter implements MeanBlurConstants{
 	private int kernelWidth = 7, kernelHeight = 7;
 	
-	private int operationType = TYPE_MAX;
+	private AverageType operationType = TYPE_MAX;
 	private Distance distance = EUCLIDEAN_DISTANCE;
-	
-	public static final int TYPE_ARITHMETIC_MEAN = 0, TYPE_GEOMETRIC_MEAN = 1, TYPE_MEDIAN = 2, TYPE_MAX = 3, TYPE_MIN = 4;
-	
+	private boolean update = true;
 	
 	public MeanBlur(){
 		
 	}
-	public MeanBlur(final int kernelSize, final int operationType){
+	public MeanBlur(final int kernelSize, final AverageType operationType){
 		this.setKernelSize(kernelSize);
 		this.setOperationType(operationType);
 	}
-	public MeanBlur(final Image image, final int kernelSize, final int operationType){
+	public MeanBlur(final Image image, final int kernelSize, final AverageType operationType){
 		this.setKernelSize(kernelSize);
 		this.setOperationType(operationType);
 		this.setImage(image);
 	}
-	public MeanBlur(final Image image, final int kernelSize, final int operationType, final Distance radialDistance){
+	public MeanBlur(final Image image, final int kernelSize, final AverageType operationType, final Distance radialDistance){
 		this.setKernelSize(kernelSize);
 		this.setOperationType(operationType);
 		this.setImage(image);
 		this.setRadialDistance(radialDistance);
 	}
-	public MeanBlur(final Image image, final int kernelWidth, final int kernelHeight, final int operationType, final Distance radialDistance){
+	public MeanBlur(final Image image, final int kernelWidth, final int kernelHeight, final AverageType operationType, final Distance radialDistance){
 		this.setKernelWidth(kernelWidth);
 		this.setKernelHeight(kernelHeight);
 		this.setOperationType(operationType);
@@ -62,9 +68,10 @@ public class MeanBlur extends Filter{
 		this.distance = distance;
 	}
 
-	public void setOperationType(final int operationType){
+	public void setOperationType(final AverageType operationType){
 		this.operationType = operationType;
 	}
+	
 	
 	@Override
 	public double getFilteredPixel(Image image, int x, int y, int band) {
@@ -76,7 +83,7 @@ public class MeanBlur extends Filter{
 		
 		double result = 0;
 		int counter = 0;
-		boolean firstTime = true;
+		
 		for (int i= y - sY; i<= y + sY; i++){
 			for (int j= x - sX; j<= x + sX; j++){
 				
@@ -87,21 +94,27 @@ public class MeanBlur extends Filter{
 					result += image.getPixelBoundaryMode(j, i, band);
 					break;
 				case TYPE_GEOMETRIC_MEAN:
-					if (firstTime) {result = 1; firstTime = false;}
+					if (update) {result = 1; update = false;}
 					result *= image.getPixelBoundaryMode(j, i, band);
 					break;
 				case TYPE_MAX:
-					if (firstTime) {result = Integer.MIN_VALUE; firstTime = false;}
+					if (update) {result = Integer.MIN_VALUE; update = false;}
 					result = (image.getPixelBoundaryMode(j, i, band) > result) ? image.getPixelBoundaryMode(j, i, band) : result;
 					break;
 				case TYPE_MIN:
-					if (firstTime) {result = Integer.MAX_VALUE; firstTime = false;}
+					if (update) {result = Integer.MAX_VALUE; update = false;}
 					result = (image.getPixelBoundaryMode(j, i, band) < result) ? image.getPixelBoundaryMode(j, i, band) : result;
 					break;
 				case TYPE_MEDIAN:
-					for (int k=0; k<values.size(); k++){
-						if (values.get(k) > image.getPixelBoundaryMode(j, i, band))
-							values.add(k, image.getPixelBoundaryMode(j, i, band));
+					if (values.size() == 0) values.add(image.getPixelBoundaryMode(j, i, band));
+					else{
+						For:
+						for (int k=0; k<values.size(); k++){
+							if (values.get(k) > image.getPixelBoundaryMode(j, i, band)){
+								values.add(k, image.getPixelBoundaryMode(j, i, band));
+								break For;
+							}
+						}
 					}
 					break;
 				}
@@ -125,4 +138,8 @@ public class MeanBlur extends Filter{
 		return result;
 	}
 	
+	public Image applyFilter(final Image image) {
+		update = true;
+		return super.applyFilter(image);
+	}
 }

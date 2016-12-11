@@ -120,6 +120,7 @@ public class CoOccurrenceMatrix {
 	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public TreeMap<Double, TreeMap<Double, Integer>> getMatrix(){
+		if (band >= image.getNumBands()) band = 0;
 		
 		if ((lastHash == this.image.hashCode() || update) && bufferedMatrix != null) return bufferedMatrix;
 		

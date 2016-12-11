@@ -4,7 +4,6 @@ import filters.Filter;
 import filters.border.HessianFilter;
 import image.Image;
 
-import static filters.border.HessianFilter.HessianOperationType.*;
 
 /**
  * Implementation inspired by the work of Frangi et al. : Multiscale vessel enhancement filtering
@@ -50,10 +49,10 @@ public class VesselnessFilter extends Filter{
 			hessian.setScale(scale);
 		}
 		
-		hessian.setOperationType(TYPE_FIRST_EIGENVALUE);
+		hessian.setOperationType(HessianFilter.TYPE_FIRST_EIGENVALUE);
 		double firstEigen = hessian.getFilteredPixel(x, y, band);
 		
-		hessian.setOperationType(TYPE_SECOND_EIGENVALUE);
+		hessian.setOperationType(HessianFilter.TYPE_SECOND_EIGENVALUE);
 		double secondEigen = hessian.getFilteredPixel(x, y, band);
 		
 		final double aux = firstEigen;

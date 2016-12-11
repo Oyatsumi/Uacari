@@ -5,7 +5,8 @@ import filters.blur.GaussianBlur;
 import image.Image;
 
 public class EnhanceSharpAreas extends Filter{
-	private float kernelWidth = 10, kernelHeight = 10, amplitude = 2, differenceX = 0.1f, differenceY = 0.1f;
+	private float kernelWidth = 10, kernelHeight = 10, amplitude = 2, differenceX = 0.1f, differenceY = 0.1f,
+			spreadX = 1, spreadY = 1;
 	
 	private GaussianBlur g1 = null, g2 = null;
 	
@@ -26,6 +27,8 @@ public class EnhanceSharpAreas extends Filter{
 		this.setDifferenceY(differenceY);
 	}
 	
+	public void setSpreadX(final float spreadX){this.spreadX = spreadX;}
+	public void setSpreadY(final float spreadY){this.spreadY = spreadY;}
 	public void setKernelSize(final int kernelSize){this.setKernelWidth(kernelSize); this.setKernelHeight(kernelSize);}
 	public void setKernelWidth(final int kernelWidth){this.kernelWidth = kernelWidth; this.update = true;}
 	public void setKernelHeight(final int kernelHeight){this.kernelHeight = kernelHeight; this.update = true;}
@@ -47,8 +50,8 @@ public class EnhanceSharpAreas extends Filter{
 	@Override
 	public double getFilteredPixel(Image image, int x, int y, int band) {
 		if (g1 == null || update){
-			g1 = new GaussianBlur((int)kernelWidth, (int)kernelHeight, amplitude, 1 - differenceX, 1 - differenceY);
-			g2 = new GaussianBlur((int)kernelWidth, (int)kernelHeight, amplitude, 1, 1);
+			g1 = new GaussianBlur((int)kernelWidth, (int)kernelHeight, amplitude, spreadX - differenceX, spreadY - differenceY);
+			g2 = new GaussianBlur((int)kernelWidth, (int)kernelHeight, amplitude, spreadX, spreadY);
 			update = false;
 		}
 		

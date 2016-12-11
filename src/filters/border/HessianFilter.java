@@ -1,21 +1,32 @@
 package filters.border;
 
 import filters.Filter;
-
 import image.Image;
 
-import static filters.border.HessianFilter.HessianOperationType.*;
+
+interface HessianFilterConstants{
+	public static final HessianOperationType TYPE_ELEMENT0_0 = HessianOperationType.TYPE_ELEMENT0_0, TYPE_ELEMENT0_1 = HessianOperationType.TYPE_ELEMENT0_1, 
+			TYPE_ELEMENT1_0 = HessianOperationType.TYPE_ELEMENT1_0, TYPE_ELEMENT1_1 = HessianOperationType.TYPE_ELEMENT1_1,
+	TYPE_MODULE = HessianOperationType.TYPE_MODULE, TYPE_TRACE = HessianOperationType.TYPE_TRACE, 
+	TYPE_DETERMINANT = HessianOperationType.TYPE_DETERMINANT, TYPE_FIRST_EIGENVALUE = HessianOperationType.TYPE_FIRST_EIGENVALUE, 
+	TYPE_SECOND_EIGENVALUE = HessianOperationType.TYPE_SECOND_EIGENVALUE, TYPE_ORIENTATION = HessianOperationType.TYPE_ORIENTATION,
+	TYPE_GAMMA_NORM_SQUARE_EIGENVALUE_DIFFERENCE = HessianOperationType.TYPE_GAMMA_NORM_SQUARE_EIGENVALUE_DIFFERENCE, 
+	TYPE_SQUARE_OF_GAMMA_NORM_EINGENVALUE_DIFFERENCE = HessianOperationType.TYPE_GAMMA_NORM_SQUARE_EIGENVALUE_DIFFERENCE, 
+	TYPE_FIRST_EIGENVALUE_2 = HessianOperationType.TYPE_FIRST_EIGENVALUE_2,	TYPE_SECOND_EIGENVALUE_2 = HessianOperationType.TYPE_SECOND_EIGENVALUE_2;
+	public static enum HessianOperationType{ TYPE_ELEMENT0_0, TYPE_ELEMENT0_1, TYPE_ELEMENT1_0, TYPE_ELEMENT1_1,
+		TYPE_MODULE, TYPE_TRACE, TYPE_DETERMINANT, TYPE_FIRST_EIGENVALUE, TYPE_SECOND_EIGENVALUE, TYPE_ORIENTATION,
+		TYPE_GAMMA_NORM_SQUARE_EIGENVALUE_DIFFERENCE, TYPE_SQUARE_OF_GAMMA_NORM_EINGENVALUE_DIFFERENCE, TYPE_FIRST_EIGENVALUE_2,
+		TYPE_SECOND_EIGENVALUE_2;}
+}
+
+
 
 /**
  * Filters the image according to properties of the Hessian Matrix.
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
-public class HessianFilter extends Filter{
-	public static enum HessianOperationType{ TYPE_ELEMENT0_0, TYPE_ELEMENT0_1, TYPE_ELEMENT1_0, TYPE_ELEMENT1_1,
-			TYPE_MODULE, TYPE_TRACE, TYPE_DETERMINANT, TYPE_FIRST_EIGENVALUE, TYPE_SECOND_EIGENVALUE, TYPE_ORIENTATION,
-			TYPE_GAMMA_NORM_SQUARE_EIGENVALUE_DIFFERENCE, TYPE_SQUARE_OF_GAMMA_NORM_EINGENVALUE_DIFFERENCE, TYPE_FIRST_EIGENVALUE_2,
-			TYPE_SECOND_EIGENVALUE_2;
-	}
+public class HessianFilter extends Filter implements HessianFilterConstants{
+
 	
 	private boolean useGaussianGradient = true; //if set to false it will use a linear one - Sobel-like (faster)11
 	private int distance = 1;
@@ -89,6 +100,11 @@ public class HessianFilter extends Filter{
 		
 	}
 	
+	/**
+	 * Sets the distance of the linear gradient. It is a linear gradient parameter only, it does nothing if GaussianGradient is set to be used.
+	 * @param distance
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setDistance(final int distance){this.distance = distance;}
 	public void setOperationType(final HessianOperationType operation){this.operation = operation;}
 	

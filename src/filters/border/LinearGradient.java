@@ -3,28 +3,30 @@ package filters.border;
 import filters.Filter;
 import image.Image;
 
-import static filters.border.LinearGradient.LinearGradientType.*;
+
 /**
  * Combines the derivatives in the x and y directions.
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
-public class LinearGradient extends Filter{
+public class LinearGradient extends Filter implements GradientConstants{
 	/**
 	 * OPERATION INDEXES
 	 */
-	public static enum LinearGradientType{TYPE_MEAN, TYPE_SUM, TYPE_DIFFERENCE, TYPE_PRODUCT, TYPE_DIVISION_X, TYPE_DIVISION_Y};
+
+
+	
 	private int distance = 1;
-	private LinearGradientType operation = TYPE_MEAN;
+	private AverageType operation = TYPE_MEAN;
 	private boolean computeXAxis = true, computeYAxis = true;
 	
 	public LinearGradient(){
 		
 	}
-	public LinearGradient(final int distance, final LinearGradientType operation){
+	public LinearGradient(final int distance, final AverageType operation){
 		this.setDistance(distance);
 		this.setOperation(operation);
 	}
-	public LinearGradient(final Image image, final int distance, final LinearGradientType operation){
+	public LinearGradient(final Image image, final int distance, final AverageType operation){
 		this.setImage(image);
 		this.setDistance(distance);
 		this.setOperation(operation);
@@ -45,7 +47,7 @@ public class LinearGradient extends Filter{
 	 * @param operation
 	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
-	public void setOperation(final LinearGradientType operation){this.operation = operation;}
+	public void setOperation(final AverageType operation){this.operation = operation;}
 	public void setAxisOrientation(final boolean computeXAxis, final boolean computeYAxis){
 		this.computeXAxis = computeXAxis;
 		this.computeYAxis = computeYAxis;

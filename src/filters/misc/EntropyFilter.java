@@ -11,16 +11,16 @@ import similarity.distances.EuclideanDistance;
  * Entropy: draws a circle of radius r around each pixel; gets the histogram of that circle split in numBins chunks; then calculates the entropy as \sum_{p~\mathrm{in}~\mathrm{histogram}} -p*\mathrm{log}_2(p), where p is the probability of each chunk in the histogram..
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
-public class Entropy extends Filter {
+public class EntropyFilter extends Filter {
 	private float radius = 7;
 	private int numOfChunks = 16;
 	private Distance distanceMeasure = new EuclideanDistance();
 	
-	public Entropy(){
+	public EntropyFilter(){
 		
 	}
 	
-	public Entropy(final int numOfChunks, final int kernelRadius, final Distance distance){
+	public EntropyFilter(final int numOfChunks, final int kernelRadius, final Distance distance){
 		this.setNumOfChunks(numOfChunks);
 		this.setKernelRadius(kernelRadius);
 		this.setDistance(distance);

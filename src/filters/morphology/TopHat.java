@@ -1,8 +1,9 @@
 package filters.morphology;
 
 import image.Image;
+import morphology.MorphologyConstants;
 
-public class TopHat extends Opening{
+public class TopHat extends Opening implements MorphologyConstants{
 	
 	private boolean firstTime = true;
 

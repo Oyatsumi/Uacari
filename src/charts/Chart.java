@@ -28,7 +28,7 @@ public class Chart {
 	private BigDecimal sumY = null;
 	private long pointsQuantity = 0;
 	private int timesToDilate = 0;
-	private Image structuringElement = Morphology.PRIMARY_STRUCT;
+	private Image structuringElement = Morphology.STRUCT_PRIMARY;
 	private String name = null;
 	
 	private byte padding = 5;
