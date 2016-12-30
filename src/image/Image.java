@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -68,6 +69,7 @@ public class Image{
 	private boolean updateHashCode = false;
 	private int hashCodeShift = 0;
 	//
+	private boolean rectifyAlpha = false; //if true pixels values are multiplied by their alpha layer correspondent
 	
 	public static enum BoundaryOperationType{BOUNDARY_MODULE, BOUNDARY_REFLECT}
 	
@@ -84,9 +86,10 @@ public class Image{
 		this.type = img.getType();
 		this.bands = (byte) img.getNumBands();
 		updateBuffered = true; updateHistogram = true; updateMean = true;
-		display = null; morphology = null; bImg = null; intensities = null;
+		display = null; morphology = null; bImg = null; intensities = null; minMax = null;
 		return this;
 	}
+	
 
 	/**
 	 * Creates a 8-bits depth image
@@ -166,7 +169,10 @@ public class Image{
 		}else updateImage(img);
 	}
 	public void updateImage(BufferedImage img){
-		raster = img.getRaster();
+		//raster = img.getRaster();
+		setImageFromBufferedImage(img);
+		
+		/*
 		if (this.getType() == img.getType() && raster.getNumBands() == this.getNumBands()) {
 			setImageFromBufferedImage(img);
 			return;
@@ -182,6 +188,7 @@ public class Image{
 		}
 		
 		this.setToUpdateBuffers();
+		*/
 	}
 
 	
@@ -208,8 +215,8 @@ public class Image{
 		this.scale(scaleX, scaleY);
 		//updateImage(this.getBufferedImage(), (int)(this.getWidth()*scaleX), (int)(this.getHeight()*scaleY));
 	}
-	private BufferedImage createBufferedImage() throws Exception{return createBufferedImage(this.getWidth(), this.getHeight());}
-	private BufferedImage createBufferedImage(int width, int height) throws Exception{
+	private BufferedImage createBufferedImage() {return createBufferedImage(this.getWidth(), this.getHeight());}
+	private BufferedImage createBufferedImage(int width, int height) {
 		int type = (this.getNumBands() == 1) ? BufferedImage.TYPE_BYTE_GRAY : (this.getNumBands() == 3) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
 		this.bImg = new BufferedImage(width, height, type);
 		this.raster = bImg.getRaster();
@@ -297,54 +304,7 @@ public class Image{
 	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public double getPixelBoundaryMode(int x, int y){
-		final int width = this.getWidth(), height = this.getHeight();
-		if (x < 0 || y < 0 || x >= width || y >= height){
-			if (this.backgroundColor != null){
-				return this.backgroundColor[0];
-			}else{
-				int nX = 0, nY = 0;
-				if (x < 0){
-					switch(this.getBoundaryOperation()){
-					case BOUNDARY_MODULE:
-						nX = width - 1 - Math.abs(x % width);
-						break;
-					case BOUNDARY_REFLECT:
-						nX = Math.abs(x % width);
-						break;
-					}
-				}else if (x >= width){
-					switch(this.getBoundaryOperation()){
-					case BOUNDARY_MODULE:
-						nX = Math.abs(x % width);
-						break;
-					case BOUNDARY_REFLECT:
-						nX = width - 1 - Math.abs(x % width);
-						break;
-					}
-				}
-				if (y < 0){
-					switch(this.getBoundaryOperation()){
-					case BOUNDARY_MODULE:
-						nY = height - 1 - Math.abs(y % height);
-						break;
-					case BOUNDARY_REFLECT:
-						nY = Math.abs(y % height);
-						break;
-					}
-				}else if (y >= height){
-					switch(this.getBoundaryOperation()){
-					case BOUNDARY_MODULE:
-						nY = Math.abs(y % height);
-						break;
-					case BOUNDARY_REFLECT:
-						nY = height - 1 - Math.abs(y % height);
-						break;
-					}
-				}
-				return this.getPixel(nX, nY);
-			}
-		}
-		return this.pixMap.get(x, y);
+		return getPixelBoundaryMode(x, y, 0);
 	}
 	/**
 	 * Returns the pixel at position (x,y).
@@ -403,13 +363,17 @@ public class Image{
 				return this.getPixel(nX, nY, band);
 			}
 		}
-		return this.pixMap.get(x, y);
+		return this.getPixel(x, y, band);
 	}
 	public double getPixel(int x, int y){
-		return this.pixMap.get(x, y);
+		return getPixel(x, y, 0);
 	}
 	public double getPixel(int x, int y, int band){
-		return this.pixMap.get(x, y, band);
+		float factor = 1;
+		if (this.isToRectifyAlpha() && band != 3 && this.getNumBands() > 3) {
+			factor = (float) (this.pixMap.get(x, y, 3)/(float)this.getMaximalIntensity(3));
+		}
+		return this.pixMap.get(x, y, band) * factor;
 	}
 
 	public int[][] getMatrixImage() throws Exception{
@@ -432,7 +396,7 @@ public class Image{
 	 * @return
 	 * @throws Exception
 	 */
-	public BufferedImage getBufferedImage() throws Exception{
+	public BufferedImage getBufferedImage() {
 		if (!this.updateBuffered) return this.bImg;
 		
 		if (!this.hasBufferedImage()) createBufferedImage();
@@ -472,10 +436,14 @@ public class Image{
 			}
 		return type;
 	}
-	private Vector minMax = null; 
+	//private Vector minMax = null; 
+	private HashMap<Integer, Vector> minMax = null;
 	public Vector getMinMaxIntensity(int band){
 		if (this.updateHistogram) {minMax = null; this.updateHistogram = false;}
 		if (minMax == null){
+			minMax = new HashMap<Integer, Vector>();
+		}
+		if (!minMax.containsKey(band)){
 			double min = Long.MAX_VALUE, max = Long.MIN_VALUE;
 			double value = 0;
 			for (int i=0; i<this.getHeight(); i++){
@@ -488,9 +456,9 @@ public class Image{
 						max = value;
 				}
 			}
-			minMax = new Vector((float)min, (float)max);
+			minMax.put(band,  new Vector(min, max));
 		}
-		return minMax;
+		return minMax.get(band);
 	}
 	public double getMinimalIntesity(int band){
 		return this.getMinMaxIntensity(band).x;
@@ -571,6 +539,15 @@ public class Image{
 	 * @param newMinimum
 	 * @param newMaximum
 	 */
+	public Image normalize(double newMinimum, double newMaximum){
+		return stretchOrShrinkRange(newMinimum, newMaximum);
+	}
+	/**
+	 * Linearly convert the image values to a new range. If your images goes from -10 to 80, and your pass as parameter newMinimum = 0 and newMaximum = 255, your
+	 * image is stretched out to fir the range [0,255], for instance.
+	 * @param newMinimum
+	 * @param newMaximum
+	 */
 	public Image stretchOrShrinkRange(double newMinimum, double newMaximum){
 		for (int b=0; b<this.getNumBands(); b++){
 			final double max = this.getMaximalIntensity(b), min = this.getMinimalIntesity(b);
@@ -598,6 +575,24 @@ public class Image{
 	
 	
 	//set
+	public void setSize(final int width, final int height){
+		Image nImg = new Image(width, height, this.getNumBands(), this.getBitDepth(), this.containsFloatValues());
+		for (int b=0; b<this.getNumBands(); b++){
+			for (int i=0; i<height && i<this.getHeight(); i++){
+				for (int j=0; j<width && j<this.getWidth(); j++){
+					nImg.setPixel(j, i, this.getPixelBoundaryMode(j, i, b));
+				}
+			}
+		}
+		this.set(nImg);
+	}
+	public void setWidth(final int width){
+		this.setSize(width, this.getHeight());
+	}
+	public void setHeight(final int height){
+		this.setSize(this.getWidth(), height);
+	}
+	public void setToRectifyAlpha(final boolean rectifyAlpha){this.rectifyAlpha = rectifyAlpha;}
 	/**
 	 * Sets the boundary operation.
 	 * @param boundaryOperation -
@@ -638,6 +633,25 @@ public class Image{
 	public void setNumBands(int num) throws Exception{this.bands = (byte) num; setConfiguration(num, this.getBitDepth());}
 	public void setType(int type) throws Exception{this.type = type; setConfiguration(this.getNumBands(), getAssociatedNumBands(type));}
 	
+	public Image convertToRGB() throws Exception{
+		return convertToRGB(8);
+	}
+	public Image convertToRGB(final int bitDepth) throws Exception{
+		PixelMap pm = new PixelMap(this.getWidth(), this.getHeight(), 3, bitDepth, false);
+		for (int b=0; b<3; b++){
+			for (int i=0; i<this.getHeight(); i++){
+				for (int j=0; j<this.getWidth(); j++){
+					pm.set(j, i, b, this.getPixel(j, i, 0));
+				}
+			}
+		}
+		this.setNumBands(3);
+		this.setType(BufferedImage.TYPE_INT_RGB);
+		//this.updateBuffered = true;
+		this.setToUpdateBuffers();
+		this.pixMap = pm;
+		return this;
+	}
 	public Image convertToGray() throws Exception{return convertToGray(8);}
 	public Image convertToGray(int bitDepth) throws Exception{
 		PixelMap pm = new PixelMap(this.getWidth(), this.getHeight(), 1, bitDepth, false);
@@ -673,23 +687,29 @@ public class Image{
 	 * @param interpolationType - the types can be Image.BICUBIC, Image.BILINEAR or Image.NEAREST_NEIGHBOR
 	 */
 	public void setInterpolation(Object interpolationType){this.op.setInterpolation(interpolationType);}
-	public void setConfiguration(int numBands, int bitDepth) throws Exception{setConfiguration(numBands, 8, false);}
+	public void setBitDepth(final int bitDepth) throws Exception{this.setConfiguration(this.getNumBands(), bitDepth);}
+	public void setConfiguration(int numBands, int bitDepth) throws Exception{setConfiguration(numBands, bitDepth, false);}
 	public void setConfiguration(int numBands) throws Exception{setConfiguration(numBands, 8, false);}
 	public void setConfiguration(int numBands, int bitDepth, boolean containsFloatValues) throws Exception{ //TERMINAR
+		
 		if (bitDepth < 32 && containsFloatValues){Logger.log("The minimum bit-depth for float values is 32, resetting it to 32.\n");}
-		PixelMap pMap = this.pixMap;
+		PixelMap previousMap = this.pixMap;
 		this.bands = (byte) numBands;
-		this.type = getAssociatedType(bitDepth / 8);
+		this.type = getAssociatedType(numBands);
 		this.pixMap = new PixelMap(this.getWidth(), this.getHeight(), numBands, bitDepth, containsFloatValues);
 		for (int i=0; i<this.getHeight(); i++){
 			for (int j=0; j<this.getWidth(); j++){
 				for (int b=0; b<numBands; b++){
-					this.setPixel(j, i, b, pMap.get(j, i, b));
+					int bP = b;
+					if (previousMap.getNumBands() <= b)
+						bP = previousMap.getNumBands() - 1;
+					
+					this.setPixel(j, i, b, previousMap.get(j, i, bP));
 				}
 			}
 		}
-		pMap.dispose();
-		pMap = null;
+		previousMap.dispose();
+		previousMap = null;
 		if (this.hasBufferedImage()){
 			//this.setNumBands(numBands);
 			//int type = (this.getNumBands() == 1) ? BufferedImage.TYPE_BYTE_GRAY : (this.getNumBands() == 3) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
@@ -704,6 +724,11 @@ public class Image{
 	}
 	public void setImageFromBufferedImage(BufferedImage img){
 		if (pixMap != null) pixMap.dispose();
+		
+		if (img.getRaster().getNumBands() == 4){
+			this.setToRectifyAlpha(true);
+		}
+		
 		//update objects
 		this.setToUpdateBuffers(); this.updateBuffered = false;
 		this.bImg = img;
@@ -759,6 +784,7 @@ public class Image{
 
 	
 	//is
+	public boolean isToRectifyAlpha(){return this.rectifyAlpha;}
 	public boolean isGray(){return bands == 1;}
 	public boolean isBinary(){return this.getBitDepth() == 1;}
 	
@@ -883,6 +909,94 @@ public class Image{
 		else return this.skeletonize(Morphology.STRUCT_PRIMARY, times);
 	}
 	
+	/**
+	 * Operates the image according to the operation in PixelOperation
+	 * @param pixelOperation
+	 * @param band
+	 * @return
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public Image operate(final PixelOperation pixelOperation){
+		for (int b=0; b<this.getNumBands(); b++){
+			operate(pixelOperation, b);
+		}
+		return this;
+	}
+	
+	/**
+	 * Operates the image according to the operation in PixelOperation
+	 * @param pixelOperation
+	 * @param band
+	 * @return
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public Image operate(final PixelOperation pixelOperation, final int band){
+		double[] pixels = new double[1];
+		for (int i=0; i<this.getHeight(); i++){
+			for (int j=0; j<this.getWidth(); j++){
+				pixels[0] = this.getPixel(j, i, band);
+				this.setPixel(j, i, band, pixelOperation.compute(pixels));
+			}
+		}
+		return this;
+	}
+	
+	/**
+	 * Operates the image along with the images passed as parameter according to the operation defined in PixelOperation
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public Image operate(final PixelOperation pixelOperation, final Image image){
+		Image[] imgArray = new Image[1];
+		imgArray[0] = image;
+		for (int b=0; b<this.getNumBands(); b++)
+			operate(pixelOperation, b, imgArray);
+		return this;
+	}
+	
+	/**
+	 * Operates the image along with the images passed as parameter according to the operation defined in PixelOperation
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public Image operate(final PixelOperation pixelOperation, final int band, final Image image){
+		Image[] imgArray = new Image[1];
+		imgArray[0] = image;
+		return operate(pixelOperation, band, imgArray);
+	}
+
+	/**
+	 * Operates the image along with the images passed as parameter according to the operation defined in PixelOperation
+	 * @param pixelOperation
+	 * @param images
+	 * @return
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public Image operate(final PixelOperation pixelOperation, final Image... images){
+		for (int b=0; b<this.getNumBands(); b++)
+			operate(pixelOperation, b, images);
+		return this;
+	}
+	
+	/**
+	 * Operates the image along with the images passed as parameter according to the operation defined in PixelOperation
+	 * @param pixelOperation
+	 * @param band
+	 * @param images
+	 * @return
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public Image operate(final PixelOperation pixelOperation, final int band, final Image... images){
+		double[] pixels = new double[images.length + 1];
+		for (int i=0; i<this.getHeight(); i++){
+			for (int j=0; j<this.getWidth(); j++){
+				pixels[0] = this.getPixel(j, i, band);
+				for (int k=0; k<images.length; k++){
+					pixels[k + 1] = images[k].getPixelBoundaryMode(j, i, band);
+				}
+				this.setPixel(j, i, band, pixelOperation.compute(pixels));
+			}
+		}
+		return this;
+	}
 	
 	/**
 	 * Transforms this image in a subimage, starting at position (x, y), with width and height as set in the parameters.
@@ -996,7 +1110,7 @@ public class Image{
 	public Image translate(int x, int y) throws Exception{op.translate(x, y); return this;}
 	public Image scale(double x, double y) throws Exception{op.scale(x, y); return this;}
 	public Image scaleWithFixedSize(double x, double y) throws Exception{op.scaleWithFixedSize(x, y); return this;}
-	public Image transform(AffineTransform at) throws Exception{op.transform(at); return this;}
+	public Image transform(AffineTransform at) {op.transform(at); return this;}
 	public Image rotate(double theta)throws Exception{op.rotate(theta, true); return this;}
 	public Image rotateWithoutCentralizing(double theta)throws Exception{op.rotate(theta, false); return this;}
 	
@@ -1016,7 +1130,7 @@ public class Image{
 	 */
 	public Image drawString(int x, int y, String str) throws Exception{op.drawString(x, y, str, null, null); return this;}
 	public Image drawString(int x, int y, String str, Color color, Font font) throws Exception{op.drawString(x, y, str, color, font); return this;}
-	public Image blendImages(Image topImg, int posX, int posY) throws Exception{op.blendImages(topImg.getBufferedImage(), posX, posY); return this;}
+	public Image blendImages(Image topImg, int posX, int posY) throws Exception{op.blendImages(topImg, posX, posY); return this;}
 	public Image invert(){op.invert(); return this;}
 	public Image intersect(Image imgToIntersect){op.intersect(imgToIntersect); return this;}
 	public Image maskedImage(Image mask){op.getMaskedImage(mask); return this;}

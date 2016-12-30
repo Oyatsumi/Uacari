@@ -4,6 +4,10 @@ import filters.blur.GaussianBlur;
 import image.Image;
 import log.Logger;
 
+/**
+ * A Laplacian filter.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class LaplacianFilter extends GaussianBlur{
 	
 	private double negativeSum = 0;

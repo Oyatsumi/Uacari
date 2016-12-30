@@ -6,7 +6,7 @@ import image.Image;
 
 
 /**
- * Implementation inspired by the work of Frangi et al. : Multiscale vessel enhancement filtering
+ * Implementation inspired by the work of Frangi et al.: Multiscale vessel enhancement filtering
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
 public class VesselnessFilter extends Filter{

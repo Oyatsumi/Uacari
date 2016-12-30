@@ -4,6 +4,10 @@ import filters.Filter;
 import image.Image;
 import log.Logger;
 
+/**
+ * A Gabor filter implementation (Sinusoidal Wave + Gaussian Function).
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class GaborFilter extends Filter{
 	private int kernelWidth = 10, kernelHeight = 10;
 	private float spreadX = 2f, spreadY = 2f, delta = (float) (0.25f*Math.PI);
@@ -12,7 +16,7 @@ public class GaborFilter extends Filter{
 	
 	
 	/**
-	 * Set the orientation in degrees.
+	 * Set the orientation of the function in degrees.
 	 * @param delta - the degree of rotation.
 	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
@@ -21,36 +25,71 @@ public class GaborFilter extends Filter{
 		update = true;
 	}
 	
+	/**
+	 * Sets the offset of the function.
+	 * @param offset
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setOffset(final float offset){
 		this.offSet = offset;
 		update = true;
 	}
 	
+	/**
+	 * Sets the width of the kernel.
+	 * @param kernelSizeX
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setKernelWidth(final int kernelSizeX){
 		this.kernelWidth = kernelSizeX;
 		update = true;
 	}
 	
+	/**
+	 * Sets the size of the kernel.
+	 * @param kernelSizeY
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setKernelHeight(final int kernelSizeY){
 		this.kernelHeight = kernelSizeY;
 		update = true;
 	}
 	
+	/**
+	 * Sets the size of the kernel (width and height).
+	 * @param kernelSize
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setKernelSize(final int kernelSize){
 		this.setKernelWidth(kernelSize);
 		this.setKernelHeight(kernelSize);
 	}
 	
+	/**
+	 * Sets the spread on the x direction of the Gaussian function.
+	 * @param spreadX
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setSpreadX(final float spreadX){
 		this.spreadX = spreadX;
 		update = true;
 	}
 	
+	/**
+	 * Sets the spread on the y direction of the Gaussian function.
+	 * @param spreadY
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setSpreadY(final float spreadY){
 		this.spreadY = spreadY;
 		update = true;
 	}
 	
+	/**
+	 * Sets the spread on both x and y directions of the Gaussian function.
+	 * @param spread
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setSpread(final float spread){
 		this.setSpreadX(spread);
 		this.setSpreadY(spread);

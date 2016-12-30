@@ -5,20 +5,39 @@ import filters.Filter;
 import image.Image;
 import morphology.MorphologyConstants;
 
+/**
+ * Opening operation from mathematical morphology (erosion + dilation).
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class Opening extends Filter implements MorphologyConstants{
 
 	protected Image resultImage = null;
 	private Image structuringElement = STRUCT_PRIMARY;
 	private int timesToDilate = 3, timesToErode = 3;
 	
+	/**
+	 * Sets the structuring element to be used.
+	 * @param structuringElement
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setStructuringElement(final Image structuringElement){
 		this.structuringElement = structuringElement;
 	}
 	
+	/**
+	 * Sets how many times the image should be dilated.
+	 * @param timesToDilate
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setTimesToDilate(final int timesToDilate){
 		this.timesToDilate = timesToDilate;
 	}
 	
+	/**
+	 * Sets how many times the image should be eroded.
+	 * @param timesToErode
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setTimesToErode(final int timesToErode){
 		this.timesToErode = timesToErode;
 	}

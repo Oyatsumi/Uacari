@@ -4,6 +4,10 @@ import filters.Filter;
 import filters.blur.GaussianBlur;
 import image.Image;
 
+/**
+ * Enchance sharpen areas based on a "laplacian-gaussian" filter.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class EnhanceSharpAreas extends Filter{
 	private float kernelWidth = 10, kernelHeight = 10, amplitude = 2, differenceX = 0.1f, differenceY = 0.1f,
 			spreadX = 1, spreadY = 1;

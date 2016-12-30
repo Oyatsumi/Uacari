@@ -1,11 +1,14 @@
 package filters.blur;
 
-import static similarity.distances.Distance.*;
+import static distances.Distance.*;
 
-
+import distances.Distance;
 import image.Image;
-import similarity.distances.Distance;
 
+/**
+ * Box blur filter. Uses the Chebyshev Distance to compute the blur in a box-fashion.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class BoxBlur extends MeanBlur{
 
 	public BoxBlur(){

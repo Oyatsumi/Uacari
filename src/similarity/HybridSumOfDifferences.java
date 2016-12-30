@@ -65,7 +65,7 @@ public class HybridSumOfDifferences extends SimilarityMeasure {
 				for (int i=0; i<height; i++){
 					for (int j=0; j<width; j++){
 						delta = img1.getPixel(j, i, b);
-						mSample = (img2.getPixel(j, i, b)*(img1MaxIntensity/(double)img2MaxIntensity));
+						mSample = (img2.getPixel(j, i, b)*(img1MaxIntensity/img2MaxIntensity));
 						fCounter = 1;
 						//if (img1.getPixel(j, i, b) >= 0){
 							if (mSample > threshold){
@@ -135,7 +135,7 @@ public class HybridSumOfDifferences extends SimilarityMeasure {
 	}
 
 	@Override
-	public boolean increasesIfBetter() {
+	public boolean invert() {
 		return false;
 	}
 

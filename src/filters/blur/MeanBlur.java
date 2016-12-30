@@ -2,13 +2,18 @@ package filters.blur;
 
 import filters.Filter;
 import image.Image;
-import similarity.distances.Distance;
 
-import static similarity.distances.Distance.*;
+import static distances.Distance.*;
 
 import java.util.ArrayList;
 
+import distances.Distance;
 
+
+/**
+ * An average blur.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 interface MeanBlurConstants {
 	public static enum AverageType{TYPE_ARITHMETIC_MEAN, TYPE_GEOMETRIC_MEAN, TYPE_MEDIAN, TYPE_MAX, TYPE_MIN;}
 	public static final AverageType TYPE_MAX = AverageType.TYPE_MAX, TYPE_ARITHMETIC_MEAN = AverageType.TYPE_ARITHMETIC_MEAN,
@@ -21,7 +26,6 @@ public class MeanBlur extends Filter implements MeanBlurConstants{
 	
 	private AverageType operationType = TYPE_MAX;
 	private Distance distance = EUCLIDEAN_DISTANCE;
-	private boolean update = true;
 	
 	public MeanBlur(){
 		
@@ -49,25 +53,51 @@ public class MeanBlur extends Filter implements MeanBlurConstants{
 		this.setRadialDistance(radialDistance);
 	}
 	
+	/**
+	 * Sets the size of the kernel (width and height).
+	 * @param kernelSize
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setKernelSize(final int kernelSize){
 		this.setKernelWidth(kernelSize);
 		this.setKernelHeight(kernelSize);
 	}
 	
+	/**
+	 * Sets the width of the kernel.
+	 * @param kernelWidth
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setKernelWidth(final int kernelWidth){
 		this.kernelWidth = kernelWidth;
 		if (kernelWidth % 2 == 0) this.kernelWidth ++;
 	}
 	
+	/**
+	 * Sets the height of the kernel.
+	 * @param kernelHeight
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setKernelHeight(final int kernelHeight){
 		this.kernelHeight = kernelHeight;
 		if (kernelHeight % 2 == 0) this.kernelHeight ++;
 	}
 	
+	/**
+	 * Sets the distance for each pixel. If Euclidean Distance is selected, then a circular region around each pixel is regarded.
+	 * If Chebyshev Distance is selected, for instance, a squared region around each pixel is regarded instead.
+	 * @param distance
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setRadialDistance(final Distance distance){
 		this.distance = distance;
 	}
 
+	/**
+	 * Sets the operation type for the mean blur, arithmetic, geometric, etc.
+	 * @param operationType
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setOperationType(final AverageType operationType){
 		this.operationType = operationType;
 	}
@@ -84,6 +114,8 @@ public class MeanBlur extends Filter implements MeanBlurConstants{
 		double result = 0;
 		int counter = 0;
 		
+		boolean firstTime = true;
+		
 		for (int i= y - sY; i<= y + sY; i++){
 			for (int j= x - sX; j<= x + sX; j++){
 				
@@ -94,15 +126,15 @@ public class MeanBlur extends Filter implements MeanBlurConstants{
 					result += image.getPixelBoundaryMode(j, i, band);
 					break;
 				case TYPE_GEOMETRIC_MEAN:
-					if (update) {result = 1; update = false;}
+					if (firstTime) {result = 1; firstTime = false;}
 					result *= image.getPixelBoundaryMode(j, i, band);
 					break;
 				case TYPE_MAX:
-					if (update) {result = Integer.MIN_VALUE; update = false;}
+					if (firstTime) {result = Integer.MIN_VALUE; firstTime = false;}
 					result = (image.getPixelBoundaryMode(j, i, band) > result) ? image.getPixelBoundaryMode(j, i, band) : result;
 					break;
 				case TYPE_MIN:
-					if (update) {result = Integer.MAX_VALUE; update = false;}
+					if (firstTime) {result = Integer.MAX_VALUE; firstTime = false;}
 					result = (image.getPixelBoundaryMode(j, i, band) < result) ? image.getPixelBoundaryMode(j, i, band) : result;
 					break;
 				case TYPE_MEDIAN:
@@ -139,7 +171,6 @@ public class MeanBlur extends Filter implements MeanBlurConstants{
 	}
 	
 	public Image applyFilter(final Image image) {
-		update = true;
 		return super.applyFilter(image);
 	}
 }

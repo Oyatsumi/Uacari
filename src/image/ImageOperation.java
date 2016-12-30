@@ -1,7 +1,9 @@
 package image;
 
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -115,7 +117,7 @@ public class ImageOperation {
 		associatedImg.updateImage(outBuffImg);
 		return outBuffImg;
 	}
-	public BufferedImage transform(AffineTransform t/*, Object interpolation*/) throws Exception{
+	public BufferedImage transform(AffineTransform t/*, Object interpolation*/) {
 		outBuffImg = new BufferedImage(associatedImg.getWidth(), associatedImg.getHeight(), associatedImg.getType());
 		g2d = outBuffImg.createGraphics();
 		setRenderingKeys(g2d);
@@ -181,26 +183,61 @@ public class ImageOperation {
 		return outBuffImg;
 	}
 	
+	public Image blendImages(final Image topImage, final int x, final int y){
+		float maxAlphaInt = 1;
+		if ((associatedImg.isToRectifyAlpha() || topImage.isToRectifyAlpha()) && topImage.getNumBands() > 3) {
+			maxAlphaInt = (float)topImage.getMaximalIntensity(3);
+			if (maxAlphaInt < 255) maxAlphaInt = 255;
+		}
+		for (int b=0; b<associatedImg.getNumBands(); b++){
+			if (b == 3 && (associatedImg.isToRectifyAlpha() || topImage.isToRectifyAlpha())) break;
+			for (int i=0; i<topImage.getHeight(); i++){
+				for (int j=0; j<topImage.getWidth(); j++){
+					if ((i + y) >= associatedImg.getHeight() || (j + x) >= associatedImg.getWidth()) continue;
+					
+					int pB = (topImage.getNumBands() <= b) ? topImage.getNumBands() - 1 : b;
+					
+					if ((associatedImg.isToRectifyAlpha() || topImage.isToRectifyAlpha())){
+						if ((float)(topImage.getPixel(j, i, 3)/(float)maxAlphaInt) >= 1f){
+							associatedImg.setPixel(j + x, i + y, b, topImage.getPixel(j, i, pB));
+						}else{
+							associatedImg.setPixel(j + x, i + y, b, associatedImg.getPixel(j + x, i + y, b) + topImage.getPixel(j, i, pB));
+						}
+					}else{
+						
+						associatedImg.setPixel(j + x, i + y, b, topImage.getPixel(j, i, pB));
+					}
+				}
+			}
+		}
+		return associatedImg;
+	}
 	
-	
+	/*
 	public BufferedImage blendImages(BufferedImage topImg, int x, int y) throws Exception{return blendImages(topImg, new Point2D.Float(x, y));}
 	public BufferedImage blendImages(BufferedImage topImg, Vector topImgPosition) throws Exception{
-		return blendImages(topImg, new Point2D.Float(topImgPosition.x, topImgPosition.y));
+		return blendImages(topImg, new Point2D.Float((float)topImgPosition.x, (float)topImgPosition.y));
 	}
-	public BufferedImage blendImages(BufferedImage topImg, Point2D topImgPosition) throws Exception{
+	
+	public Image blendImages(BufferedImage topImg, Point2D topImgPosition) throws Exception{
+		
 		outBuffImg = new BufferedImage(associatedImg.getWidth(), associatedImg.getHeight(), topImg.getType());
 		// paint both images, preserving the alpha channels
+		
 		g2d = (Graphics2D) outBuffImg.getGraphics();
 		setRenderingKeys(g2d);
 		g2d.drawImage(associatedImg.getBufferedImage(), 0, 0, null);
 		g2d.drawImage(topImg, (int)topImgPosition.getX(), (int)topImgPosition.getY(), null);
 		g2d.dispose();
 		associatedImg.updateImage(outBuffImg);
+	
 		return outBuffImg;
 	}
+	
 	public BufferedImage blendImages(Image topImg, Point2D topImgPosition) throws Exception{
 		return blendImages(topImg.getBufferedImage(), topImgPosition);
 	}
+	*/
 	
 	public Image invert(){
 		for (int b=0; b<associatedImg.getNumBands(); b++){

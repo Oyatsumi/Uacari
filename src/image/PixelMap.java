@@ -38,6 +38,10 @@ class PixelMap {
 				for (int b=0; b<numBands; b++)
 					layers[b] = new IntegerPixelData(width, height);
 			}
+			else if (bitDepth > 32){
+				for (int b=0; b<numBands; b++)
+					layers[b] = new DoublePixelData(width, height);
+			}
 		}
 
 	}

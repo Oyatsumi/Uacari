@@ -1,4 +1,4 @@
-package similarity.distances;
+package distances;
 
 import java.math.BigDecimal;
 

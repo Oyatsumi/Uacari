@@ -3,6 +3,11 @@ package filters.morphology;
 import image.Image;
 import morphology.MorphologyConstants;
 
+/**
+ * Top-hat operation from mathematical morphology (opening then subtracts the result from the original image).
+ *
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class TopHat extends Opening implements MorphologyConstants{
 	
 	private boolean firstTime = true;

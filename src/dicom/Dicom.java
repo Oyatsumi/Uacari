@@ -47,8 +47,9 @@ public class Dicom {
 	 * Otherwise, use the dicom constructor: DicomXML(String dicomFilePath, String outputXmlPath).
 	 * @param xmlFilePath
 	 */
-	public Dicom(String xmlFilePath) {
-		this.xmlPath = xmlFilePath;
+	public Dicom(String dicomFilePath) {
+		this.xmlPath = dicomFilePath;
+		init(dicomFilePath, dicomFilePath + ".xml");
 	}
 	
 	/**
@@ -58,18 +59,22 @@ public class Dicom {
 	 * @param outputXmlPath
 	 */
 	public Dicom(String dicomFilePath, String outputXmlPath){
+		init(dicomFilePath, outputXmlPath);
+	}
+	
+	private void init(String dicomFilePath, String outputXmlPath){
 		String args[] = new String[3];
-			args[0] = dicomFilePath;
-			//File dicomFile = new File(dicomFilePath);
-			args[1] = "-o"; //writes output file
-			File newdir = new File(outputXmlPath).getParentFile();
-			if (!newdir.exists()) newdir.mkdir();
-			args[2] = outputXmlPath;
-			Dcm2Xml.main(args);
-			newdir = null;
-			
-			//then instantiates DicomXML
-			this.xmlPath = outputXmlPath;
+		args[0] = dicomFilePath;
+		//File dicomFile = new File(dicomFilePath);
+		args[1] = "-o"; //writes output file
+		File newdir = new File(outputXmlPath).getParentFile();
+		if (!newdir.exists()) newdir.mkdir();
+		args[2] = outputXmlPath;
+		Dcm2Xml.main(args);
+		newdir = null;
+		
+		//then instantiates DicomXML
+		this.xmlPath = outputXmlPath;
 	}
 
 	private static final String TAG_FINAL_FORMAT = "</attr>";
@@ -335,7 +340,7 @@ public class Dicom {
 	public Vector getVoxelCoordinates(int x, int y) throws Exception{
 		if (voxelCoord != null) return voxelCoord;
 		
-		float Xx = this.getImageOrientationX().x, Xy = this.getImageOrientationX().y, Xz = this.getImageOrientationX().z,
+		double Xx = this.getImageOrientationX().x, Xy = this.getImageOrientationX().y, Xz = this.getImageOrientationX().z,
 			Yx = this.getImageOrientationY().x, Yy = this.getImageOrientationY().y, Yz = this.getImageOrientationY().z,	
 			Sx = this.getImagePosition().x, Sy = this.getImagePosition().y, Sz = this.getImagePosition().z,
 			dY = this.getPixelSpacing().y, dX = this.getPixelSpacing().x;
@@ -355,7 +360,7 @@ public class Dicom {
 	 * @return - the distance between this and dcm2
 	 * @throws Exception
 	 */
-	public float getDistanceBetweenSlices(Dicom dcm2) throws Exception{
+	public double getDistanceBetweenSlices(Dicom dcm2) throws Exception{
 		return Math.abs(this.getVoxelCoordinates(0, 0).z - dcm2.getVoxelCoordinates(0, 0).z);
 	}
 	
@@ -541,7 +546,7 @@ public class Dicom {
 	 * @throws Exception
 	 */
 	public Image getRescaledImage(float pixelSpacingX, float pixelSpacingY, float minRange, float maxRange) throws Exception{
-		float ratioX = this.getPixelSpacing().x/(float)pixelSpacingX,
+		double ratioX = this.getPixelSpacing().x/(float)pixelSpacingX,
 				ratioY = this.getPixelSpacing().y/(float)pixelSpacingY;
 		Image out = new Image(this.getBufferedImageOnRange(minRange, maxRange));
 		out.scale(ratioX, ratioY);

@@ -67,7 +67,7 @@ public class SumOfDifferences extends SimilarityMeasure{
 		return "Sum Of Differences";
 	}
 	@Override
-	public boolean increasesIfBetter() {
+	public boolean invert() {
 		return false;
 	}
 	

@@ -1,8 +1,8 @@
-package similarity.distances;
+package similarity;
 
 
+import distances.Distance;
 import image.Image;
-import similarity.SimilarityMeasure;
 
 /**
  * A class implementing the Hausdorff distance. Brute force, which is very slow. Works with binary images only.
@@ -109,7 +109,7 @@ public class HausdorffDistance extends SimilarityMeasure{
 		return null;
 	}
 	@Override
-	public boolean increasesIfBetter() {
+	public boolean invert() {
 		return false;
 	}
 	

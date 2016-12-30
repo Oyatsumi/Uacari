@@ -87,7 +87,7 @@ public class DiceIndex extends SimilarityMeasure{
 		return "Dice Index";
 	}
 	@Override
-	public boolean increasesIfBetter() {
+	public boolean invert() {
 		return true;
 	}
 }

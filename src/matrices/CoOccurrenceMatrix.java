@@ -1,13 +1,13 @@
 package matrices;
 
+import static distances.Distance.*;
+
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import distances.Distance;
 import image.Image;
 import log.Logger;
-import similarity.distances.Distance;
-
-import static similarity.distances.Distance.*;
 
 public class CoOccurrenceMatrix {
 	private Image image;
@@ -279,7 +279,7 @@ public class CoOccurrenceMatrix {
 	
 	
 	/**
-	 * Returns the sum of the co-occurrences in the matrix. Equivalent to the Haralick's energy.
+	 * Returns the squared sum of the co-occurrences in the matrix. Equivalent to the Haralick's energy.
 	 * In other words, the greater the number of co-occurrences, the greater the returned value.
 	 * @return
 	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)

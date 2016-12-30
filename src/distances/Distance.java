@@ -1,4 +1,5 @@
-package similarity.distances;
+package distances;
+
 
 public interface Distance {
 	public static final Distance EUCLIDEAN_DISTANCE = new EuclideanDistance(), MANHATTAN_DISTANCE = new ManhattanDistance(), 
@@ -13,6 +14,7 @@ public interface Distance {
 	 * @return
 	 */
 	public double compute(double[] x, double[] y);
+
 	
 	
 }

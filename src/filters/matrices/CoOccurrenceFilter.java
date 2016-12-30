@@ -1,12 +1,12 @@
 package filters.matrices;
 
+import static distances.Distance.*;
+
+import distances.Distance;
 import filters.Filter;
 
 import image.Image;
 import matrices.CoOccurrenceMatrix;
-import similarity.distances.Distance;
-
-import static similarity.distances.Distance.*;
 
 interface CoOccurrenceConstants{
 	public static CoOccurrenceType TYPE_ENERGY = CoOccurrenceType.TYPE_ENERGY, TYPE_CONTRAST = CoOccurrenceType.TYPE_CONTRAST,
@@ -15,6 +15,10 @@ interface CoOccurrenceConstants{
 			TYPE_ENTROPY, TYPE_MOMENT;}
 }
 
+/**
+ * A filter based on the Co-Occurrence Matrix.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class CoOccurrenceFilter extends Filter implements CoOccurrenceConstants{
 	private int kernelSizeX = 7, kernelSizeY = 7;
 	private Distance kernelRadialDistance = CHEBYSHEV_DISTANCE;
@@ -99,16 +103,38 @@ public class CoOccurrenceFilter extends Filter implements CoOccurrenceConstants{
 		this.setKernelHeight(kernelSize);
 		this.setKernelWidth(kernelSize);
 	}
+	/**
+	 * Sets the distance type of the computation. If the euclidean distance is set, then a circular region around the iterated pixel is regarded.
+	 * If the chebyshev distance is chosen, then a squared region would be regarded instead.
+	 * @param distance
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setKernelRadialDistanceMeasure(final Distance distance){
 		this.kernelRadialDistance = distance;
 	}
+	/**
+	 * Sets to compute in both orientations. Preferably leave it as default.
+	 * @param computeBothOrientations
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setToComputeToBothOrientations(final boolean computeBothOrientations){
 		this.computeBothOrientations = computeBothOrientations;
 	}
+	/**
+	 * Sets the delta x and delta y for the computation of the co-occurrence matrix.
+	 * @param deltaX
+	 * @param deltaY
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setDelta(final int deltaX, final int deltaY){
 		this.deltaX = deltaX;
 		this.deltaY = deltaY;
 	}
+	/**
+	 * Sets the moment degree for the computation of moments based on the co-occurrence matrix (if applicable).
+	 * @param degree
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setMomentDegree(final float degree){
 		this.momentDegree = degree;
 	}

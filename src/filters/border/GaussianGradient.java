@@ -5,9 +5,13 @@ import image.Image;
 import log.Logger;
 
 
+/**
+ * Computes a Gaussian-function based Gradient of the image on both or single directions.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class GaussianGradient extends GaussianBlur implements GradientConstants{
 	protected boolean computeXAxis = true, computeYAxis = true;
-	private boolean supressPrint = false;
+	private boolean suppressPrint = false;
 	private double[][] kernelX, kernelY;
 	private AverageType operationType = TYPE_MEAN;
 	
@@ -17,15 +21,39 @@ public class GaussianGradient extends GaussianBlur implements GradientConstants{
 	}
 	
 	
+	/**
+	 * Instantiates a Gaussian Gradient filter.
+	 */
 	public GaussianGradient(){
 		this.setToSupressKernelPrint(false);
 	}
 	
-	public void setToSupressKernelPrint(final boolean supress){
-		this.supressPrint = supress;
+	/**
+	 * Instantiates a Gaussian Gradient filter.
+	 * @param computeXAxis - compute on the x axis.
+	 * @param computeYAxis - compute on the y axis.
+	 */
+	public GaussianGradient(final boolean computeXAxis, final boolean computeYAxis){
+		this.setAxisOrientation(computeXAxis, computeYAxis);
+	}
+	
+	
+	/**
+	 * Suppress the print of the kernel.
+	 * @param suppress
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public void setToSupressKernelPrint(final boolean suppress){
+		this.suppressPrint = suppress;
 		super.supressPrint = true;
 	}
 	
+	/**
+	 * Sets the orientation of the computation of the gradient.
+	 * @param computeXAxis - compute on the x direction.
+	 * @param computeYAxis - compute on the y direction.
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setAxisOrientation(final boolean computeXAxis, final boolean computeYAxis){
 		if (computeXAxis != this.computeXAxis || computeYAxis != this.computeYAxis) update = true;
 		this.computeXAxis = computeXAxis;
@@ -54,14 +82,14 @@ public class GaussianGradient extends GaussianBlur implements GradientConstants{
 				}
 				
 				
-				if (!supressPrint) Logger.log("Gaussian gradient kernel on the X direction: \n");
+				if (!suppressPrint) Logger.log("Gaussian gradient kernel on the X direction: \n");
 				for (int i=0; i<kernelX.length; i++){
 					for (int j=0; j<kernelX[0].length; j++){
-						if (!supressPrint) Logger.log(kernelX[i][j] + " ");
+						if (!suppressPrint) Logger.log(kernelX[i][j] + " ");
 					}
-					if (!supressPrint) Logger.log("\n");
+					if (!suppressPrint) Logger.log("\n");
 				}
-				if (!supressPrint) Logger.log("-----------------\n");
+				if (!suppressPrint) Logger.log("-----------------\n");
 			}
 			
 			if (computeYAxis){
@@ -79,14 +107,14 @@ public class GaussianGradient extends GaussianBlur implements GradientConstants{
 				}
 				
 				
-				if (!supressPrint) Logger.log("Gaussian gradient kernel on the Y direction: \n");
+				if (!suppressPrint) Logger.log("Gaussian gradient kernel on the Y direction: \n");
 				for (int i=0; i<kernelY.length; i++){
 					for (int j=0; j<kernelY[0].length; j++){
-						if (!supressPrint) Logger.log(kernelY[i][j] + " ");
+						if (!suppressPrint) Logger.log(kernelY[i][j] + " ");
 					}
-					if (!supressPrint) Logger.log("\n");
+					if (!suppressPrint) Logger.log("\n");
 				}
-				if (!supressPrint) Logger.log("-----------------\n");
+				if (!suppressPrint) Logger.log("-----------------\n");
 			}
 			
 		}

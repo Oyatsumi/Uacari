@@ -3,6 +3,10 @@ package filters.sharpen;
 import filters.Filter;
 import image.Image;
 
+/**
+ * A simple sharpen that uses a simple kernel to sharpen the image.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class SimpleSharpen extends Filter{
 	
 	public static final Image SMALL_KERNEL = new Image(new short[][]{{-1,-1,-1},{-1,9,-1},{-1,-1,-1}}),

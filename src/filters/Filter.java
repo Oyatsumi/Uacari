@@ -21,6 +21,7 @@ public abstract class Filter {
 		Image out = new Image(image.getWidth(), image.getHeight(), image.getNumBands(), 32, true);
 		this.setImage(image);
 		for (int b=0; b<image.getNumBands(); b++){
+			if (b == 3 && image.isToRectifyAlpha()) break;
 			for(int i=0; i<image.getHeight(); i++){
 				for (int j=0; j<image.getWidth(); j++){
 					out.setPixel(j, i, b, getFilteredPixel(j, i, b));
@@ -31,6 +32,11 @@ public abstract class Filter {
 		return out;
 	}
 	
+	/**
+	 * Sets the image associated to the filter.
+	 * @param image - the associated image.
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setImage(Image image){
 		this.image = image;
 		this.update = true;

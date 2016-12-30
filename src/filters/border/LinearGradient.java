@@ -5,7 +5,7 @@ import image.Image;
 
 
 /**
- * Combines the derivatives in the x and y directions.
+ * Linear gradient that combines the derivatives in the x and y directions.
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
 public class LinearGradient extends Filter implements GradientConstants{

@@ -25,7 +25,17 @@ public class Sobel extends Filter{
 		this.horizontal = applyHorizontally;
 	}
 	
+	/**
+	 * Sets the kernel for the computation of the Sobel filter in the x direction.
+	 * @param filter
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setFilterX(Image filter){this.kernelDirectionX = filter;}
+	/**
+	 * Sets the kernel for the computation of the Sobel filter in the y direction.
+	 * @param filter
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setFilterY(Image filter){this.kernelDirectionY = filter;}
 
 	

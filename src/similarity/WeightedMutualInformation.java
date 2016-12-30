@@ -124,7 +124,7 @@ public class WeightedMutualInformation extends SimilarityMeasure {
 		return "Weighted Mutual Information";
 	}
 	@Override
-	public boolean increasesIfBetter() {
+	public boolean invert() {
 		return true;
 	}
 	

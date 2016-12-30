@@ -1,9 +1,7 @@
 package similarity;
 
+import distances.Distance;
 import image.Image;
-import similarity.distances.ChamferDistance;
-import similarity.distances.Distance;
-import similarity.distances.HausdorffDistance;
 
 public abstract class SimilarityMeasure {
 	public static final SimilarityMeasure MEAN_DIFFERENCE = new MeanDifference(1), SUM_OF_DIFFERENCES = new SumOfDifferences(1),
@@ -70,7 +68,7 @@ public abstract class SimilarityMeasure {
 	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public double compareUnified(Image img1, Image img2){
-		if (increasesIfBetter()) return Long.MAX_VALUE - compare(img1, img2);
+		if (invert()) return Long.MAX_VALUE - compare(img1, img2);
 		else return compare(img1, img2);
 	}
 
@@ -84,7 +82,7 @@ public abstract class SimilarityMeasure {
 	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public double compareUnified(Image img1, Image img2, int band){
-		if (increasesIfBetter()) return Long.MAX_VALUE - compare(img1, img2, band);
+		if (invert()) return Long.MAX_VALUE - compare(img1, img2, band);
 		else return compare(img1, img2, band);
 	}
 	
@@ -150,5 +148,5 @@ public abstract class SimilarityMeasure {
 	 * @return
 	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
-	public abstract boolean increasesIfBetter();
+	public abstract boolean invert();
 }

@@ -6,7 +6,7 @@ import filters.Filter;
 import image.Image;
 
 /**
- * Implementation inspired by the work of Frangi et al. : Multiscale vessel enhancement filtering and on the matlab implementation.
+ * Implementation inspired by the work of Frangi et al.: Multiscale vessel enhancement filtering and on the matlab implementation.
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
 public class FrangiFilter extends Filter{

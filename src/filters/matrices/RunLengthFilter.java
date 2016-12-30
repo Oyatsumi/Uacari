@@ -1,11 +1,11 @@
 package filters.matrices;
 
-import static similarity.distances.Distance.CHEBYSHEV_DISTANCE;
+import static distances.Distance.CHEBYSHEV_DISTANCE;
 
+import distances.Distance;
 import filters.Filter;
 import image.Image;
 import matrices.RunLengthMatrix;
-import similarity.distances.Distance;
 
 interface RunLengthConstants{
 	public static final RunLengthType TYPE_RUN_PERCENTAGE = RunLengthType.TYPE_RUN_PERCENTAGE,
@@ -13,6 +13,10 @@ interface RunLengthConstants{
 	public static enum RunLengthType{ TYPE_RUN_PERCENTAGE, TYPE_GREY_LEVEL_NON_UNIFORMITY;}
 }
 
+/**
+ * A filter based on the run length matrix.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class RunLengthFilter extends Filter implements RunLengthConstants{
 
 	private int kernelSizeX = 7, kernelSizeY = 7;
@@ -69,12 +73,28 @@ public class RunLengthFilter extends Filter implements RunLengthConstants{
 		this.setKernelWidth(kernelSize);
 		this.setKernelHeight(kernelSize);
 	}
+	/**
+	 * Sets the width of the kernel.
+	 * @param kernelWidth
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setKernelWidth(final int kernelWidth){
 		this.kernelSizeX = kernelWidth % 2 == 0 ? kernelWidth + 1 : kernelWidth;
 	}
+	/**
+	 * Sets the height of the kernel.
+	 * @param kernelHeight
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setKernelHeight(final int kernelHeight){
 		this.kernelSizeX = kernelHeight % 2 == 0 ? kernelHeight + 1 : kernelHeight;
 	}
+	/**
+	 * Sets the distance type of the computation. If the euclidean distance is set, then a circular region around the iterated pixel is regarded.
+	 * If the chebyshev distance is chosen, then a squared region would be regarded instead.
+	 * @param distance
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setKernelRadialDistanceMeasure(final Distance distance){
 		this.kernelRadialDistance = distance;
 	}

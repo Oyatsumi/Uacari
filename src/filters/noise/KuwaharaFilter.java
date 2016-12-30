@@ -3,6 +3,10 @@ package filters.noise;
 import filters.Filter;
 import image.Image;
 
+/**
+ * Implementation of the Kuwahara Filter. It reduces noise from the image but also turns the image into a "water painting" picture.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class KuwaharaFilter extends Filter{
 	private int kernelSizeX = 7, kernelSizeY = 7;
 	

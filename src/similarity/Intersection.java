@@ -49,7 +49,7 @@ public class Intersection extends SimilarityMeasure {
 		return "Intersection";
 	}
 	@Override
-	public boolean increasesIfBetter() {
+	public boolean invert() {
 		return true;
 	}
 

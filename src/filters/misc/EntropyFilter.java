@@ -2,10 +2,10 @@ package filters.misc;
 
 import java.util.HashMap;
 
+import distances.Distance;
+import distances.EuclideanDistance;
 import filters.Filter;
 import image.Image;
-import similarity.distances.Distance;
-import similarity.distances.EuclideanDistance;
 
 /**
  * Entropy: draws a circle of radius r around each pixel; gets the histogram of that circle split in numBins chunks; then calculates the entropy as \sum_{p~\mathrm{in}~\mathrm{histogram}} -p*\mathrm{log}_2(p), where p is the probability of each chunk in the histogram..
@@ -26,12 +26,28 @@ public class EntropyFilter extends Filter {
 		this.setDistance(distance);
 	}
 	
+	/**
+	 * Sets the num of chunks or groups in which the intensities should be divided.
+	 * @param numOfChunks
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setNumOfChunks(final int numOfChunks){
 		this.numOfChunks = numOfChunks;
 	}
+	/**
+	 * Sets the radius of the kernel.
+	 * @param kernelRadius
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setKernelRadius(final int kernelRadius){
 		this.radius = kernelRadius;
 	}
+	/**
+	 * Sets the distance measure to consider the radius. If the euclidean distance is set, then a circular region around the iterated pixel is regarded.
+	 * If the chebyshev distance is chosen, then a squared region would be regarded instead.
+	 * @param distance
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setDistance(final Distance distance){
 		this.distanceMeasure = distance;
 	}

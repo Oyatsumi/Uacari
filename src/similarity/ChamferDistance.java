@@ -1,9 +1,9 @@
-package similarity.distances;
+package similarity;
 
 import java.math.BigDecimal;
 
+import distances.Distance;
 import image.Image;
-import similarity.SimilarityMeasure;
 
 /**
  * Class to compute the Chamfer Distance. It is mainly used with binary images, but we have made it to work with grey images as well.
@@ -134,7 +134,7 @@ public class ChamferDistance extends SimilarityMeasure {
 		return "Chamfer Distance";
 	}
 	@Override
-	public boolean increasesIfBetter() {
+	public boolean invert() {
 		return false;
 	}
 

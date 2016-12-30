@@ -3,6 +3,7 @@ package registration;
 import java.awt.geom.AffineTransform;
 
 import image.Image;
+import log.Logger;
 import similarity.SimilarityMeasure;
 
 public class Registration {
@@ -11,17 +12,43 @@ public class Registration {
 	private boolean printResult = true;
 	private String resultLog = null;
 	private AffineTransform lastAffineTransform = null;
+	private double bestScore = 0;
 
+	public Registration(){
+		
+	}
+	
 	public Registration(Image reference, Image sensible, RegistrationParameters params){
-		this.reference = reference;
-		this.sensible = sensible;
+		this.setImages(reference, sensible);
 		this.params = params;
 	}
 	
 	
 	public void setParameters(RegistrationParameters params){this.params = params;}
-	public void setImages(Image referenceImage, Image sensibleImage){this.reference = referenceImage; this.sensible = sensibleImage;}
 	public void setToPrintResults(boolean print){this.printResult = print;}
+	
+	public void setImages(Image referenceImage, Image sensibleImage){
+		sensibleImage = sensibleImage.clone();
+		
+		final int maxWidth = referenceImage.getWidth() > sensibleImage.getWidth() ? referenceImage.getWidth() : sensibleImage.getWidth();
+		final int maxHeight = referenceImage.getHeight() > sensibleImage.getHeight() ? referenceImage.getHeight() : sensibleImage.getHeight();
+		
+		if (maxWidth == referenceImage.getWidth()){
+			sensibleImage.setWidth(maxWidth);
+		}else if (maxWidth != referenceImage.getWidth()){
+			referenceImage.setWidth(maxWidth);
+		}
+
+		if (maxHeight == referenceImage.getHeight()){
+			sensibleImage.setHeight(maxHeight);
+		}else if (maxHeight != referenceImage.getHeight()){
+			referenceImage.setHeight(maxHeight);
+		}
+		
+		
+		this.reference = referenceImage; 
+		this.sensible = sensibleImage;
+	}
 	
 	
 	public String getResultLog(){
@@ -30,7 +57,10 @@ public class Registration {
 	public AffineTransform getBestAffineTransform(){
 		return lastAffineTransform;
 	}
-	
+	public RegistrationParameters getBestParametersList(){
+		return this.bestParams;
+	}
+	public double getBestScore(){return this.bestScore;}
 
 	/**
 	 * Processes the registration, the registration parameters and images must have been set already
@@ -38,7 +68,7 @@ public class Registration {
 	 * @throws Exception
 	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
-	public Image process() throws Exception{
+	public Image process() {
 		String log = "", bestName = "", bestParams = "";
 		AffineTransform t, bestT = null; SimilarityMeasure m;
 		Image senClone;
@@ -51,11 +81,13 @@ public class Registration {
 				senClone.transform(t);
 				//senClone.showImage();
 				rawScore = m.compare(reference, senClone);
-				if (m.increasesIfBetter()) score = Long.MAX_VALUE - rawScore; else score = rawScore;
+				if (m.invert()) score = -rawScore; else score = rawScore;
 				if (score < minScore) {
+					this.bestScore = score;
 					minScore = score;
 					bestT = t;
 					bestParams = String.format("[Similarity Score: %f]%s \n", rawScore, params.getParametersAsString());
+					this.bestParams = params;
 					bestName = m.getName();
 				}
 				log += String.format("%d: ", counter);
@@ -63,11 +95,11 @@ public class Registration {
 				log += String.format("[Similarity Score: %f]%s \n", rawScore, params.getParametersAsString());
 			}
 			//log += "\n";
-			if (printResult) System.out.printf("%s", log);
+			if (printResult) Logger.log(log);
 			resultLog += log;
 			
 			log = String.format("+=== Best Transformation for %s ===+ \n%s", bestName, bestParams);
-			if (printResult) System.out.printf("%s", log);
+			if (printResult) Logger.log(log);
 			resultLog += log;
 		}
 

@@ -8,6 +8,10 @@ interface HighOrderGradientConstants{
 	public static enum HighOrderGradientType{LINEAR, GAUSSIAN;}
 }
 
+/**
+ * Computers high order gradients or derivatives from the image.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class HighOrderGradient extends GaussianGradient implements HighOrderGradientConstants{
 	
 	
@@ -39,22 +43,47 @@ public class HighOrderGradient extends GaussianGradient implements HighOrderGrad
 		this.setGradientOrder(gradientOrder);
 	}
 	
+	/**
+	 * Sets the type of the high order gradient, it either can be linear or Gaussian-based.
+	 * @param type
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setType(HighOrderGradientType type){
 		if (this.type != type) update = true;
 		this.type = type;
 	}
+	/**
+	 * Sets the Gaussian Gradient if you have already instantiated it.
+	 * @param gaussianGradient
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setGaussianGradient(GaussianGradient gaussianGradient){
 		update = true;
 		this.gGradient = gaussianGradient;
 	}
+	/**
+	 * Sets the Linear Gradient if you have already instantiated it.
+	 * @param lGradient
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setLinearGradient(LinearGradient lGradient){
 		update = true;
 		this.lGradient = lGradient;
 	}
+	/**
+	 * Sets the distance for the computation of the linear gradient. Only applies to the linear gradient.
+	 * @param distance
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setLinearGradientDistance(final int distance){
 		update = true;
 		this.linearGradientDistance = distance;
 	}
+	/**
+	 * Sets the order of the derivatives or gradient. 
+	 * @param order
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setGradientOrder(final int order){
 		if (gradientOrder != order) update = true;
 		this.gradientOrder = order;

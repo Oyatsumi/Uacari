@@ -74,7 +74,7 @@ public class NormalizedCrossCorrelation extends SimilarityMeasure{
 		return "Normalized Cross Correlation";
 	}
 	@Override
-	public boolean increasesIfBetter() {
+	public boolean invert() {
 		return true;
 	}
 	

@@ -6,6 +6,10 @@ import morphology.Morphology;
 import morphology.MorphologyConstants;
 
 
+/**
+ * A dilation operation from mathematical morphology.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class Dilation extends Filter implements MorphologyConstants{
 	private int timesToDilate = 2;
 	
@@ -30,9 +34,19 @@ public class Dilation extends Filter implements MorphologyConstants{
 	
 	
 	
+	/**
+	 * Sets the structuring element to be used.
+	 * @param structuringElement
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setStructuringElement(final Image structuringElement){
 		this.structuringElement = structuringElement;
 	}
+	/**
+	 * Sets how many times the image should be dilated.
+	 * @param timesToDilate
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setTimesToDilate(final int timesToDilate){
 		this.timesToDilate = timesToDilate;
 	}

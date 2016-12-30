@@ -4,6 +4,10 @@ import filters.Filter;
 import filters.border.LinearGradient;
 import image.Image;
 
+/**
+ * Anisotropic diffusion is a blurring algorithm that preserve edges.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class AnisotropicDiffusion extends Filter{
 	
 	private float kappa = 3f, lambda = 0.5f;
@@ -24,6 +28,11 @@ public class AnisotropicDiffusion extends Filter{
 	
 	public void setKappa(final float kappa){this.kappa = kappa;}
 	public void setLambda(final float lambda){this.lambda = lambda;}
+	/**
+	 * Sets the number of iterations for the anisotropic diffusion.
+	 * @param iterations
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setIterations(final int iterations){this.totalIterations = iterations;}
 
 	

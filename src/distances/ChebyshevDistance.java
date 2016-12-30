@@ -1,4 +1,4 @@
-package similarity.distances;
+package distances;
 
 public class ChebyshevDistance implements Distance{
 

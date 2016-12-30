@@ -1,13 +1,13 @@
 package matrices;
 
+import static distances.Distance.*;
+
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import distances.Distance;
 import image.Image;
 import log.Logger;
-import similarity.distances.Distance;
-
-import static similarity.distances.Distance.*;
 
 public class RunLengthMatrix {
 	private Image image;

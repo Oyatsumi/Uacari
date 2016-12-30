@@ -6,6 +6,10 @@ import image.Image;
 import morphology.Morphology;
 import morphology.MorphologyConstants;
 
+/**
+ * The erosion operation from mathematical morphology.
+ * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ */
 public class Erosion extends Filter implements MorphologyConstants{
 	private int timesToErode = 2;
 	
@@ -30,11 +34,21 @@ public class Erosion extends Filter implements MorphologyConstants{
 	
 	
 	
+	/**
+	 * Sets the structuring element to be used.
+	 * @param structuringElement
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
 	public void setStructuringElement(final Image structuringElement){
 		this.structuringElement = structuringElement;
 	}
-	public void setTimesToErode(final int timesToDilate){
-		this.timesToErode = timesToDilate;
+	/**
+	 * Sets how many times the image should be eroded.
+	 * @param timesToErode
+	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 */
+	public void setTimesToErode(final int timesToErode){
+		this.timesToErode = timesToErode;
 	}
 
 	
