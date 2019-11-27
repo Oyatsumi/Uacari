@@ -28,17 +28,16 @@ import log.Logger;
 import morphology.Morphology;
 import similarity.SimilarityMeasure;
 
-import static image.Image.InterpolationType.*;
-
 import static image.Image.BoundaryOperationType.*;
 /**
  * Class representing an image.
  * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
  */
 public class Image{
-	public static enum InterpolationType{BICUBIC(RenderingHints.VALUE_INTERPOLATION_BICUBIC),
-			BILINEAR(RenderingHints.VALUE_INTERPOLATION_BILINEAR),
-			NEAREST_NEIGHBOR(RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+	public static class InterpolationType{
+		public static final Object BICUBIC = RenderingHints.VALUE_INTERPOLATION_BICUBIC,
+				BILINEAR = RenderingHints.VALUE_INTERPOLATION_BILINEAR,
+				NEAREST_NEIGHBOR = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 	
 			private Object interpolationType;
 			InterpolationType(Object interpolationType){
@@ -54,7 +53,7 @@ public class Image{
 	//private int[][] pixelValue;
 	private PixelMap pixMap = null;
 	private BufferedImage bImg = null;
-	private boolean updateBuffered = true, updateHistogram = true, updateMean = true;
+	private boolean updateBufferedImage = true, updateHistogram = true, updateMean = true;
 	//private boolean[][] binaryImgs;
 	private byte bands = 1;
 	private int type = -1;
@@ -69,12 +68,10 @@ public class Image{
 	private boolean updateHashCode = false;
 	private int hashCodeShift = 0;
 	//
-	private boolean rectifyAlpha = false; //if true pixels values are multiplied by their alpha layer correspondent
 	
 	public static enum BoundaryOperationType{BOUNDARY_MODULE, BOUNDARY_REFLECT}
 	
 	//auxiliary variables
-	private WritableRaster raster = null;
 	
 	private void instantiateMorphology(){if (morphology == null) morphology = new Morphology(this);}
 	
@@ -85,7 +82,7 @@ public class Image{
 		}
 		this.type = img.getType();
 		this.bands = (byte) img.getNumBands();
-		updateBuffered = true; updateHistogram = true; updateMean = true;
+		updateBufferedImage = true; updateHistogram = true; updateMean = true;
 		display = null; morphology = null; bImg = null; intensities = null; minMax = null;
 		return this;
 	}
@@ -219,11 +216,11 @@ public class Image{
 	private BufferedImage createBufferedImage(int width, int height) {
 		int type = (this.getNumBands() == 1) ? BufferedImage.TYPE_BYTE_GRAY : (this.getNumBands() == 3) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
 		this.bImg = new BufferedImage(width, height, type);
-		this.raster = bImg.getRaster();
+		WritableRaster raster = bImg.getRaster();
 		for (int i=0; i<height && i < this.getHeight(); i++){
 			for (int j=0; j<width && j < this.getWidth(); j++){
-				for (int b=0; b<this.raster.getNumBands() && b < this.getNumBands(); b++){
-					this.raster.setSample(j, i, b, this.getPixel(j, i, b));
+				for (int b=0; b<raster.getNumBands() && b < this.getNumBands(); b++){
+					raster.setSample(j, i, b, this.getPixel(j, i, b));
 				}
 			}
 		}
@@ -369,11 +366,7 @@ public class Image{
 		return getPixel(x, y, 0);
 	}
 	public double getPixel(int x, int y, int band){
-		float factor = 1;
-		if (this.isToRectifyAlpha() && band != 3 && this.getNumBands() > 3) {
-			factor = (float) (this.pixMap.get(x, y, 3)/(float)this.getMaximalIntensity(3));
-		}
-		return this.pixMap.get(x, y, band) * factor;
+		return this.pixMap.get(x, y, band);
 	}
 
 	public int[][] getMatrixImage() throws Exception{
@@ -397,7 +390,7 @@ public class Image{
 	 * @throws Exception
 	 */
 	public BufferedImage getBufferedImage() {
-		if (!this.updateBuffered) return this.bImg;
+		if (!this.updateBufferedImage) return this.bImg;
 		
 		if (!this.hasBufferedImage()) createBufferedImage();
 		
@@ -405,7 +398,7 @@ public class Image{
 		if (this.getNumBands() == 4) type = BufferedImage.TYPE_INT_ARGB;
 		
 		bImg = new BufferedImage(this.getWidth(), this.getHeight(), type);
-		raster = bImg.getRaster();
+		WritableRaster raster = bImg.getRaster();
 		
 		int pixelValue = 0;
 		
@@ -420,7 +413,7 @@ public class Image{
 		}
 		
 		this.setToUpdateBuffers();
-		this.updateBuffered = false;
+		this.updateBufferedImage = false;
 		raster = null;
 		return bImg;
 	}
@@ -592,7 +585,6 @@ public class Image{
 	public void setHeight(final int height){
 		this.setSize(this.getWidth(), height);
 	}
-	public void setToRectifyAlpha(final boolean rectifyAlpha){this.rectifyAlpha = rectifyAlpha;}
 	/**
 	 * Sets the boundary operation.
 	 * @param boundaryOperation -
@@ -603,7 +595,7 @@ public class Image{
 	public void setBoundaryOperation(final BoundaryOperationType boundaryOperation){
 		this.boundaryOperation = boundaryOperation;
 	}
-	public void setToUpdateBuffers(){this.updateBuffered = true; this.updateHistogram = true; this.updateMean = true; this.updateHashCode = true;}
+	public void setToUpdateBuffers(){this.updateBufferedImage = true; this.updateHistogram = true; this.updateMean = true; this.updateHashCode = true;}
 	public void setPixelAllBands(int x, int y, double value){
 		for (int b=0; b<this.getNumBands(); b++) this.pixMap.set(x, y, b, value); setToUpdateBuffers();
 	}
@@ -724,25 +716,20 @@ public class Image{
 	}
 	public void setImageFromBufferedImage(BufferedImage img){
 		if (pixMap != null) pixMap.dispose();
-		
-		if (img.getRaster().getNumBands() == 4){
-			this.setToRectifyAlpha(true);
-		}
+
 		
 		//update objects
-		this.setToUpdateBuffers(); this.updateBuffered = false;
+		this.setToUpdateBuffers(); this.updateBufferedImage = false;
 		this.bImg = img;
 		this.type = img.getType();
 		
-		raster = img.getRaster();
-		
-		
-		float opacity = 1;
+		WritableRaster raster = img.getRaster();	
 		boolean grey = true;
-		for (int i=0; i<img.getHeight() && raster.getNumBands() > 1; i++){
+		for (int i=0; i<img.getHeight() && raster.getNumBands() >= 1; i++){
 			for (int j=0; j<img.getWidth(); j++){
-				for (int b=1; b<raster.getNumBands(); b++)
+				for (int b=1; b<raster.getNumBands(); b++) {
 					grey &= raster.getSample(j, i, b) == raster.getSample(j, i, b-1);
+				}
 			}
 		}
 		
@@ -751,26 +738,18 @@ public class Image{
 		else
 			pixMap = new PixelMap(img.getWidth(), img.getHeight(), 1, 8, false);
 		
-		for (int i=0; i<img.getHeight(); i++){
-			for (int j=0; j<img.getWidth(); j++){
-				if (raster.getNumBands() == 4) {
-					opacity = raster.getSample(j, i, 3)/255f;
-				}
-				if (grey)
-					//pixMap.set(j, i, (raster.getSample(j, i, 0)));
-					this.setPixel(j, i, (raster.getSample(j, i, 0))*opacity);
-				else{
-					for (int b=0; b<raster.getNumBands(); b++){
-						//pixMap.set(j, i, b, raster.getSampleDouble(j, i, b));
-						this.setPixel(j, i, b, raster.getSampleDouble(j, i, b)*opacity);
-					}
+		if (!grey) this.bands = (byte) raster.getNumBands();
+		else this.bands = 1;
+		
+		//fill the image
+		for (int i=0; i<img.getHeight(); i++) {
+			for (int j=0; j<img.getWidth(); j++) {
+				for (int b=0; b<this.bands; b++) {
+					this.pixMap.set(j, i, b, raster.getSample(j, i, b));
 				}
 			}
 		}
 		
-		if (!grey) this.bands = (byte) raster.getNumBands();
-		else this.bands = 1;
-		raster = null;
 	}
 	
 	public void setBackgroundColor(double[] bgColor){this.backgroundColor = bgColor;}
@@ -784,7 +763,6 @@ public class Image{
 
 	
 	//is
-	public boolean isToRectifyAlpha(){return this.rectifyAlpha;}
 	public boolean isGray(){return bands == 1;}
 	public boolean isBinary(){return this.getBitDepth() == 1;}
 	

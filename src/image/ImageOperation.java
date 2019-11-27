@@ -184,29 +184,15 @@ public class ImageOperation {
 	}
 	
 	public Image blendImages(final Image topImage, final int x, final int y){
-		float maxAlphaInt = 1;
-		if ((associatedImg.isToRectifyAlpha() || topImage.isToRectifyAlpha()) && topImage.getNumBands() > 3) {
-			maxAlphaInt = (float)topImage.getMaximalIntensity(3);
-			if (maxAlphaInt < 255) maxAlphaInt = 255;
-		}
 		for (int b=0; b<associatedImg.getNumBands(); b++){
-			if (b == 3 && (associatedImg.isToRectifyAlpha() || topImage.isToRectifyAlpha())) break;
 			for (int i=0; i<topImage.getHeight(); i++){
 				for (int j=0; j<topImage.getWidth(); j++){
 					if ((i + y) >= associatedImg.getHeight() || (j + x) >= associatedImg.getWidth()) continue;
 					
 					int pB = (topImage.getNumBands() <= b) ? topImage.getNumBands() - 1 : b;
-					
-					if ((associatedImg.isToRectifyAlpha() || topImage.isToRectifyAlpha())){
-						if ((float)(topImage.getPixel(j, i, 3)/(float)maxAlphaInt) >= 1f){
-							associatedImg.setPixel(j + x, i + y, b, topImage.getPixel(j, i, pB));
-						}else{
-							associatedImg.setPixel(j + x, i + y, b, associatedImg.getPixel(j + x, i + y, b) + topImage.getPixel(j, i, pB));
-						}
-					}else{
 						
 						associatedImg.setPixel(j + x, i + y, b, topImage.getPixel(j, i, pB));
-					}
+					
 				}
 			}
 		}
