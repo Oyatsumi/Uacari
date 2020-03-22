@@ -162,7 +162,7 @@ public class Image{
 	}
 	public void updateImage(BufferedImage img, int width, int height) throws Exception{
 		if (width != this.getWidth() || height != this.getHeight()){
-			setImageFromBufferedImage(createBufferedImage(width, height));
+			setImageFromBufferedImage(updateBufferedImage(width, height));
 		}else updateImage(img);
 	}
 	public void updateImage(BufferedImage img){
@@ -201,10 +201,6 @@ public class Image{
 	}
 
 	public void resize(int width, int height) throws Exception{
-		if (!this.hasBufferedImage()){//if there is no bufferedImage
-			createBufferedImage();
-		}
-		
 		this.scale(width/(float)this.getWidth(), height/(float)this.getHeight());
 		updateImage(this.getBufferedImage(), width, height);
 	}
@@ -212,19 +208,53 @@ public class Image{
 		this.scale(scaleX, scaleY);
 		//updateImage(this.getBufferedImage(), (int)(this.getWidth()*scaleX), (int)(this.getHeight()*scaleY));
 	}
-	private BufferedImage createBufferedImage() {return createBufferedImage(this.getWidth(), this.getHeight());}
-	private BufferedImage createBufferedImage(int width, int height) {
-		int type = (this.getNumBands() == 1) ? BufferedImage.TYPE_BYTE_GRAY : (this.getNumBands() == 3) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-		this.bImg = new BufferedImage(width, height, type);
+	private BufferedImage updateBufferedImage(){
+		return updateBufferedImage(this.getWidth(), this.getHeight());
+	}
+	private BufferedImage updateBufferedImage(int width, int height) {
+		int type = (this.isGray()) ? BufferedImage.TYPE_BYTE_GRAY : BufferedImage.TYPE_INT_RGB;
+		if (this.getNumBands() == 4) type = BufferedImage.TYPE_INT_ARGB;
+
+		//check if binary
+		boolean isBinary = true;
+		double v1 = this.getPixel(0, 0, 0), v2 = v1;
+		Gray:
+		for (int i=0; i<height; i++){
+			for (int j=0; j<width; j++){
+					double v = this.getPixel(j, i, 0);
+					if (v != v1 && v != v2){
+						if (v1 != v2){
+							isBinary = false;
+							break Gray;
+						}
+						v2 = v;
+					}
+
+			}
+		}
+		if (isBinary) type = BufferedImage.TYPE_BYTE_BINARY;
+		final int MAX_V = isBinary ?  1 : 255;
+
+		System.out.println(type);
+
+		bImg = new BufferedImage(width, height, type);
 		WritableRaster raster = bImg.getRaster();
-		for (int i=0; i<height && i < this.getHeight(); i++){
-			for (int j=0; j<width && j < this.getWidth(); j++){
-				for (int b=0; b<raster.getNumBands() && b < this.getNumBands(); b++){
-					raster.setSample(j, i, b, this.getPixel(j, i, b));
+
+
+		int pixelValue = 0;
+
+		for (int i=0; i<height; i++){
+			for (int j=0; j<width; j++){
+				for (int b=0; b<this.getNumBands() && b<raster.getNumBands(); b++){
+					pixelValue = (int) this.getPixel(j, i, b);
+					if (pixelValue < 0) pixelValue = 0; if (pixelValue > MAX_V) pixelValue = MAX_V;
+					raster.setSample(j, i, b, pixelValue);
 				}
 			}
 		}
-		raster = null;
+
+		this.setToUpdateBuffers();
+		this.updateBufferedImage = false;
 		return bImg;
 	}
 	
@@ -391,31 +421,9 @@ public class Image{
 	 */
 	public BufferedImage getBufferedImage() {
 		if (!this.updateBufferedImage) return this.bImg;
-		
-		if (!this.hasBufferedImage()) createBufferedImage();
-		
-		int type = (this.isGray()) ? BufferedImage.TYPE_BYTE_GRAY : BufferedImage.TYPE_INT_RGB;
-		if (this.getNumBands() == 4) type = BufferedImage.TYPE_INT_ARGB;
-		
-		bImg = new BufferedImage(this.getWidth(), this.getHeight(), type);
-		WritableRaster raster = bImg.getRaster();
-		
-		int pixelValue = 0;
-		
-		for (int i=0; i<this.getHeight(); i++){
-			for (int j=0; j<this.getWidth(); j++){
-				for (int b=0; b<this.getNumBands() && b<raster.getNumBands(); b++){
-					pixelValue = (int) this.getPixel(j, i, b);
-					if (pixelValue < 0) pixelValue = 0; if (pixelValue > 255) pixelValue = 255;
-					raster.setSample(j, i, b, pixelValue);
-				}
-			}
-		}
-		
-		this.setToUpdateBuffers();
-		this.updateBufferedImage = false;
-		raster = null;
-		return bImg;
+
+		this.bImg = updateBufferedImage();
+		return this.bImg;
 	}
 	public int getType(){
 		if (type == -1)
@@ -507,7 +515,7 @@ public class Image{
 		boolean[][] img = new boolean [this.getHeight()][this.getWidth()];
 		for (int i=0; i<img.length; i++) for (int j=0; j<img[0].length; j++) img[i][j] = this.getPixel(j, i) > 0;
 		
-		this.convertToGray(64);
+		this.convertToGray(0, 64);
 		for (int i=0; i<this.getHeight(); i++){
 			for (int j=0; j<this.getWidth(); j++){
 				if (img[i][j]) this.setPixel(j, i, i*this.getWidth() + j);
@@ -644,18 +652,16 @@ public class Image{
 		this.pixMap = pm;
 		return this;
 	}
-	public Image convertToGray() throws Exception{return convertToGray(8);}
-	public Image convertToGray(int bitDepth) throws Exception{
+	public Image convertToGray() throws Exception{return convertToGray(0, 8);}
+	public Image convertToGray(int band, int bitDepth) throws Exception{
 		PixelMap pm = new PixelMap(this.getWidth(), this.getHeight(), 1, bitDepth, false);
 		for (int i=0; i<this.getHeight(); i++){
 			for (int j=0; j<this.getWidth(); j++){
-				pm.set(j, i, this.getPixel(j, i, 0));
+				pm.set(j, i, this.getPixel(j, i, band));
 			}
 		}
-		this.setNumBands(1);
-		this.setType(BufferedImage.TYPE_BYTE_GRAY);
-		//this.updateBuffered = true;
-		this.setToUpdateBuffers();
+		this.setConfiguration(1, BufferedImage.TYPE_BYTE_GRAY);
+
 		this.pixMap = pm;
 		return this;
 	}
@@ -692,23 +698,19 @@ public class Image{
 		for (int i=0; i<this.getHeight(); i++){
 			for (int j=0; j<this.getWidth(); j++){
 				for (int b=0; b<numBands; b++){
-					int bP = b;
 					if (previousMap.getNumBands() <= b)
-						bP = previousMap.getNumBands() - 1;
-					
-					this.setPixel(j, i, b, previousMap.get(j, i, bP));
+						continue;
+
+					this.setPixel(j, i, b, previousMap.get(j, i, b));
 				}
 			}
 		}
 		previousMap.dispose();
 		previousMap = null;
-		if (this.hasBufferedImage()){
-			//this.setNumBands(numBands);
-			//int type = (this.getNumBands() == 1) ? BufferedImage.TYPE_BYTE_GRAY : (this.getNumBands() == 3) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-			//bImg = new BufferedImage(this.getWidth(), this.getHeight(), type);
-			this.createBufferedImage();
-		}
-			
+
+
+		this.updateBufferedImage();
+
 		//if (numBands == 1) aux = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.);
 		if (this.getBitDepth() != bitDepth){
 			Logger.log("The bit depth has not changed.\n");

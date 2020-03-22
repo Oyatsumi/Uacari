@@ -4,8 +4,8 @@ import filters.Filter;
 import image.Image;
 
 /**
- * A modification of the Sobel filter, this algorithm is presented in (http://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=7502723&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D7502723)
- * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ * A modification of the Sobel filter, this algorithm is published in (http://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=7502723&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D7502723)
+ * @author Erick Oliveira Rodrigues (erickr@id.uff.br)
  */
 public class RodriguesSobel extends Filter {
 	private int distance = 5;
@@ -52,7 +52,7 @@ public class RodriguesSobel extends Filter {
 	/**
 	 * The threshold can be negative
 	 * @param threshold
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author Erick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public void setThreshold(float threshold){
 		this.threshold = threshold;

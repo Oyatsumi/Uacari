@@ -523,7 +523,7 @@ public class Dicom {
 	public Image getTransformedImageOnRange(AffineTransform at, float minRange, float maxRange) throws Exception{
 		return new Image(this.getTransformedBufferedImageOnRange(at, minRange, maxRange));
 	}
-	private final Object transfInterpolation = Image.InterpolationType.BICUBIC.getType();
+	private final Object transfInterpolation = ((Image.InterpolationType)Image.InterpolationType.BICUBIC).getType();
 	private BufferedImage getTransformedBufferedImageOnRange(AffineTransform at, float minRange, float maxRange) throws Exception {
 		if (op == null) op = new ImageOperation(new Image(this.getBufferedImageOnRange(minRange, maxRange)));
 		op.setInterpolation(transfInterpolation);
