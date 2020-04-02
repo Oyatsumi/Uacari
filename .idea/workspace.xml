@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a186d038-c88c-4d4d-a7a1-0c41d5c9919b" name="Default Changelist" comment="" />
+    <list default="true" id="a186d038-c88c-4d4d-a7a1-0c41d5c9919b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/libs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/filters/connectivity/SupConnectivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VisualComputing.iml" beforeDir="false" afterPath="$PROJECT_DIR$/VisualComputing.iml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1Xo95fQHeGLR15Yik1HgTuRTf9g" />
   <component name="ProjectViewState">
@@ -14,8 +32,18 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="Downloaded.Files.Path.Enabled" value="false" />
+    <property name="Repository.Attach.Annotations" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="false" />
+    <property name="Repository.Attach.Sources" value="false" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/libs" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.27816093" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -27,14 +55,42 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1581701398267</updated>
+      <workItem from="1585866954121" duration="3441000" />
     </task>
     <servers />
   </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
   <component name="WindowStateProjectService">
-    <state x="811" y="410" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1581702396286">
+    <state x="811" y="410" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1585867191779">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="811" y="410" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1581702396286" />
+    <state x="811" y="410" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1585867191779" />
+    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1585869585194">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1585869585194" />
+    <state x="507" y="114" key="CommitChangelistDialog2" timestamp="1585869293094">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="507" y="114" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1585869293094" />
+    <state x="917" y="289" key="FileChooserDialogImpl" timestamp="1585869782537">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="917" y="289" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1585869782537" />
+    <state x="691" y="122" key="SettingsEditor" timestamp="1585869790959">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="691" y="122" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1585869790959" />
+    <state x="915" y="441" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1585869745675">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="915" y="441" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1920.1040@0.0.1920.1040" timestamp="1585869745675" />
+    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1585869281081">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1585869281081" />
     <state x="342" y="141" key="new project wizard" timestamp="1581873622166">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
