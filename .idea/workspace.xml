@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a186d038-c88c-4d4d-a7a1-0c41d5c9919b" name="Default Changelist" comment="">
+    <list default="true" id="a186d038-c88c-4d4d-a7a1-0c41d5c9919b" name="Default Changelist" comment="sup connectivity2">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/filters/connectivity/SupConnectivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/filters/connectivity/SupConnectivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/image/Image.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/image/Image.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +51,7 @@
       <option name="presentableId" value="Default" />
       <updated>1581701398267</updated>
       <workItem from="1585866954121" duration="4536000" />
-      <workItem from="1585874932313" duration="1248000" />
+      <workItem from="1585874932313" duration="2779000" />
     </task>
     <task id="LOCAL-00001" summary="sup connectivity">
       <created>1585870699349</created>
@@ -62,7 +60,14 @@
       <option name="project" value="LOCAL" />
       <updated>1585870699349</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="sup connectivity2">
+      <created>1585877224953</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1585877224953</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -70,7 +75,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="sup connectivity" />
-    <option name="LAST_COMMIT_MESSAGE" value="sup connectivity" />
+    <MESSAGE value="sup connectivity2" />
+    <option name="LAST_COMMIT_MESSAGE" value="sup connectivity2" />
   </component>
   <component name="WindowStateProjectService">
     <state x="811" y="410" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1585867191779">
@@ -81,10 +87,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1585869585194" />
-    <state x="507" y="114" key="CommitChangelistDialog2" timestamp="1585870698342">
+    <state x="507" y="114" key="CommitChangelistDialog2" timestamp="1585877439762">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="507" y="114" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1585870698342" />
+    <state x="507" y="114" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1585877439762" />
     <state x="917" y="289" key="FileChooserDialogImpl" timestamp="1585869782537">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -97,10 +103,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="915" y="441" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1920.1040@0.0.1920.1040" timestamp="1585869745675" />
-    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1585870872126">
+    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1585877432036">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1585870872126" />
+    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1585877432036" />
     <state x="342" y="141" key="new project wizard" timestamp="1581873622166">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

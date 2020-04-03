@@ -27,7 +27,7 @@ public class SupConnectivity extends Filter {
         return score[0];
     }
 
-    private void checkPixel(Image image, int x, int y, int band, boolean[][] visitMap, long[] score){
+    private void checkPixel(final Image image, final int x, final int y, final int band, final boolean[][] visitMap, final long[] score){
         if (x < 0 || y < 0 || x >= image.getWidth() || y >= image.getHeight())
             return;
         
