@@ -3,6 +3,9 @@ package filters.connectivity;
 import filters.Filter;
 import image.Image;
 
+/**
+ * Connectivity filter. This filter should be run with a large stack size (use -Xss when launching the program).
+ */
 public class SupConnectivity extends Filter {
     private double threshold = 0;
 
@@ -18,23 +21,22 @@ public class SupConnectivity extends Filter {
     public double getFilteredPixel(Image image, int x, int y, int band) {
         boolean[][] visitMap = new boolean[image.getHeight()][image.getWidth()];
 
-        double[] score = new double[1]; //array for java to treat it as an object
-        score[0] = 0;
+        long[] score = new long[1]; //array for java to treat it as an object
         checkPixel(image, x, y, band, visitMap, score);
 
         return score[0];
     }
 
-    private void checkPixel(Image image, int x, int y, int band, boolean[][] visitMap, double[] score){
+    private void checkPixel(Image image, int x, int y, int band, boolean[][] visitMap, long[] score){
         if (x < 0 || y < 0 || x >= image.getWidth() || y >= image.getHeight())
             return;
-
-        if (image.getPixel(x,y,band) > this.threshold && !visitMap[y][x]) {
+        
+        if (image.getPixel(x, y, band) > this.threshold && !visitMap[y][x]) {
             score[0]++;
             visitMap[y][x] = true; //mark as visited
         }else
             return;
-
+        
         //cross
         checkPixel(image, x-1, y, band, visitMap, score);
         checkPixel(image, x+1, y, band, visitMap, score);

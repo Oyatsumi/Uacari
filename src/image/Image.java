@@ -235,7 +235,6 @@ public class Image{
 		if (isBinary) type = BufferedImage.TYPE_BYTE_BINARY;
 		final int MAX_V = isBinary ?  1 : 255;
 
-		System.out.println(type);
 
 		bImg = new BufferedImage(width, height, type);
 		WritableRaster raster = bImg.getRaster();

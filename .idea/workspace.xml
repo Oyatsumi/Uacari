@@ -2,13 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a186d038-c88c-4d4d-a7a1-0c41d5c9919b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/libs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/filters/connectivity/SupConnectivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VisualComputing.iml" beforeDir="false" afterPath="$PROJECT_DIR$/VisualComputing.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/filters/connectivity/SupConnectivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/filters/connectivity/SupConnectivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/image/Image.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/image/Image.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +20,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="MERGE" />
   </component>
   <component name="ProjectId" id="1Xo95fQHeGLR15Yik1HgTuRTf9g" />
   <component name="ProjectViewState">
@@ -55,12 +52,25 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1581701398267</updated>
-      <workItem from="1585866954121" duration="3441000" />
+      <workItem from="1585866954121" duration="4536000" />
+      <workItem from="1585874932313" duration="1248000" />
     </task>
+    <task id="LOCAL-00001" summary="sup connectivity">
+      <created>1585870699349</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1585870699349</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="sup connectivity" />
+    <option name="LAST_COMMIT_MESSAGE" value="sup connectivity" />
   </component>
   <component name="WindowStateProjectService">
     <state x="811" y="410" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1585867191779">
@@ -71,10 +81,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1585869585194" />
-    <state x="507" y="114" key="CommitChangelistDialog2" timestamp="1585869293094">
+    <state x="507" y="114" key="CommitChangelistDialog2" timestamp="1585870698342">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="507" y="114" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1585869293094" />
+    <state x="507" y="114" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1585870698342" />
     <state x="917" y="289" key="FileChooserDialogImpl" timestamp="1585869782537">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -87,10 +97,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="915" y="441" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1920.1040@0.0.1920.1040" timestamp="1585869745675" />
-    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1585869281081">
+    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1585870872126">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1585869281081" />
+    <state x="769" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1585870872126" />
     <state x="342" y="141" key="new project wizard" timestamp="1581873622166">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
