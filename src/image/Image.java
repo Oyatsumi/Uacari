@@ -26,14 +26,17 @@ import javax.swing.filechooser.FileSystemView;
 import filters.Filter;
 import log.Logger;
 import morphology.Morphology;
+import morphology.MorphologyConstants;
 import similarity.SimilarityMeasure;
 
 import static image.Image.BoundaryOperationType.*;
 /**
  * Class representing an image.
- * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
  */
 public class Image{
+	public static MorphologyConstants MorphologyConstants;
+
 	public static class InterpolationType{
 		public static final Object BICUBIC = RenderingHints.VALUE_INTERPOLATION_BICUBIC,
 				BILINEAR = RenderingHints.VALUE_INTERPOLATION_BILINEAR,
@@ -48,7 +51,8 @@ public class Image{
 				return interpolationType;
 			}
 	}
-	
+
+
 	private List<TreeMap<Double, Integer>> intensities = null; //ascendingly ordered
 	//private int[][] pixelValue;
 	private PixelMap pixMap = null;
@@ -193,7 +197,7 @@ public class Image{
 	 * Applis a filer passed as parameter to the current image.
 	 * @param filter
 	 * @return
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public Image applyFilter(Filter filter){
 		this.set(filter.applyFilter(this));
@@ -327,7 +331,7 @@ public class Image{
 	 * Returns the pixel at position (x,y).
 	 * If the position is out of the image boundaries, then return the background color if set, otherwise returns 0 on that position.
 	 * @return
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public double getPixelBoundaryMode(int x, int y){
 		return getPixelBoundaryMode(x, y, 0);
@@ -339,11 +343,11 @@ public class Image{
 	 * @param y
 	 * @param band
 	 * @return
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public double getPixelBoundaryMode(int x, int y, int band){
-		final int width = this.getWidth(), height = this.getHeight();
-		if (x < 0 || y < 0 || x >= width || y >= height){
+		final int WIDTH = this.getWidth(), HEIGHT = this.getHeight();
+		if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT){
 			if (this.backgroundColor != null){
 				return this.backgroundColor[band];
 			}else{
@@ -351,38 +355,38 @@ public class Image{
 				if (x < 0){
 					switch(this.getBoundaryOperation()){
 					case BOUNDARY_MODULE:
-						nX = width - 1 - Math.abs(x % width);
+						nX = WIDTH - 1 - Math.abs(x % WIDTH);
 						break;
 					case BOUNDARY_REFLECT:
-						nX = Math.abs(x % width);
+						nX = Math.abs(x % WIDTH);
 						break;
 					}
-				}else if (x >= width){
+				}else if (x >= WIDTH){
 					switch(this.getBoundaryOperation()){
 					case BOUNDARY_MODULE:
-						nX = Math.abs(x % width);
+						nX = Math.abs(x % WIDTH);
 						break;
 					case BOUNDARY_REFLECT:
-						nX = width - 1 - Math.abs(x % width);
+						nX = WIDTH - 1 - Math.abs(x % WIDTH);
 						break;
 					}
 				}
 				if (y < 0){
 					switch(this.getBoundaryOperation()){
 					case BOUNDARY_MODULE:
-						nY = height - 1 - Math.abs(y % height);
+						nY = HEIGHT - 1 - Math.abs(y % HEIGHT);
 						break;
 					case BOUNDARY_REFLECT:
-						nY = Math.abs(y % height);
+						nY = Math.abs(y % HEIGHT);
 						break;
 					}
-				}else if (y >= height){
+				}else if (y >= HEIGHT){
 					switch(this.getBoundaryOperation()){
 					case BOUNDARY_MODULE:
-						nY = Math.abs(y % height);
+						nY = Math.abs(y % HEIGHT);
 						break;
 					case BOUNDARY_REFLECT:
-						nY = height - 1 - Math.abs(y % height);
+						nY = HEIGHT - 1 - Math.abs(y % HEIGHT);
 						break;
 					}
 				}
@@ -597,7 +601,7 @@ public class Image{
 	 * @param boundaryOperation -
 	 * {@link Image#BOUNDARY_MODULE} if we want to take the module of the coordinate in respect to the size of the image, or
 	 * {@link Image#BOUNDARY_REFLECT} if we want to take the reflect the pixels near the boundary.
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public void setBoundaryOperation(final BoundaryOperationType boundaryOperation){
 		this.boundaryOperation = boundaryOperation;
@@ -828,7 +832,7 @@ public class Image{
 	 * @param outputPath
 	 * @param formatName
 	 * @throws Exception
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public void exportImage(String outputPath, String formatName) throws Exception{
 		ImageIO.write(this.getBufferedImage(), formatName.toUpperCase(), new File(outputPath));
@@ -838,7 +842,7 @@ public class Image{
 	 * Saves the image as png on the path provided
 	 * @param outputPath
 	 * @throws Exception
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public void exportImage(String outputPath) throws Exception{
 		ImageIO.write(this.getBufferedImage(), "PNG", new File(outputPath));
@@ -847,7 +851,7 @@ public class Image{
 	/**
 	 * Saves the image as png in a standard folder
 	 * @throws Exception
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public void exportImage() throws Exception{
 		File home = FileSystemView.getFileSystemView().getHomeDirectory(),
@@ -893,7 +897,7 @@ public class Image{
 	 * @param pixelOperation
 	 * @param band
 	 * @return
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public Image operate(final PixelOperation pixelOperation){
 		for (int b=0; b<this.getNumBands(); b++){
@@ -907,7 +911,7 @@ public class Image{
 	 * @param pixelOperation
 	 * @param band
 	 * @return
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public Image operate(final PixelOperation pixelOperation, final int band){
 		double[] pixels = new double[1];
@@ -922,7 +926,7 @@ public class Image{
 	
 	/**
 	 * Operates the image along with the images passed as parameter according to the operation defined in PixelOperation
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public Image operate(final PixelOperation pixelOperation, final Image image){
 		Image[] imgArray = new Image[1];
@@ -934,7 +938,7 @@ public class Image{
 	
 	/**
 	 * Operates the image along with the images passed as parameter according to the operation defined in PixelOperation
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public Image operate(final PixelOperation pixelOperation, final int band, final Image image){
 		Image[] imgArray = new Image[1];
@@ -947,7 +951,7 @@ public class Image{
 	 * @param pixelOperation
 	 * @param images
 	 * @return
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public Image operate(final PixelOperation pixelOperation, final Image... images){
 		for (int b=0; b<this.getNumBands(); b++)
@@ -961,7 +965,7 @@ public class Image{
 	 * @param band
 	 * @param images
 	 * @return
-	 * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+	 * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public Image operate(final PixelOperation pixelOperation, final int band, final Image... images){
 		double[] pixels = new double[images.length + 1];

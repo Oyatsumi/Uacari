@@ -18,7 +18,7 @@ import morphology.Morphology;
 import static image.Image.InterpolationType.*;
 /**
  * Some image operations. Including various Java's Graphics2D derived operations.
- * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
  */
 public class ImageOperation {
 
@@ -265,7 +265,8 @@ public class ImageOperation {
 		for (int b=0; b<associatedImg.getNumBands(); b++){
 			for (int i=0; i<associatedImg.getHeight(); i++){
 				for (int j=0; j<associatedImg.getWidth(); j++){
-					if (mask.getPixel(j, i, b) <= 0){
+					int band = b; if (mask.getNumBands() == 1) band = 0;
+					if (mask.getPixel(j, i, band) <= 0){
 						associatedImg.setPixel(j, i, b, 0);
 					}
 				}

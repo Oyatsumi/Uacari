@@ -25,7 +25,7 @@ import image.Vector;
  *  This class requires further optimization, however, it works. One possible optimization is to stop working with text files and to work directly with
  *  the binary DICOM files. We generate a XML file from the DICOM using a third party library and read the data from the generated file (slow).
  *  
- *  @author Érick Oliveira Rodrigues (erickr@id.uff.br).
+ *  @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br).
  */
 public class Dicom {
 	private final static int bufferedImageType = BufferedImage.TYPE_BYTE_GRAY;
@@ -261,7 +261,7 @@ public class Dicom {
 			
 			/*
 			//complement of 2
-			//JAVA 7 - NÃO TÁ FUNCIONANDO PERFEITAMENTE
+			//JAVA 7 - Nï¿½O Tï¿½ FUNCIONANDO PERFEITAMENTE
 			byte signal = 1;
 			long value;
 			bs = BitSet.valueOf(new long[] {this.getPixelRawData(x, y)});
@@ -331,7 +331,7 @@ public class Dicom {
 	
 	private Vector voxelCoord = null;
 	/**
-	 * The coordinates in three dimensions of the voxel (parameters: x,y) in the frame’s image plane in units of mm (millimeters). 
+	 * The coordinates in three dimensions of the voxel (parameters: x,y) in the frameï¿½s image plane in units of mm (millimeters). 
 	 * @param x
 	 * @param y
 	 * @return - A vector containing position x, y and z
