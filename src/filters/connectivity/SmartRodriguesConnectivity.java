@@ -9,7 +9,7 @@ import image.Image;
  */
 public class SmartRodriguesConnectivity extends Filter {
     private double threshold = 0;
-    private long maxErrorScore = 20;
+    private long maxErrorScore = 100; //70
     private double maxDistance = 3;
     private Image kernel = new Image(new int[][]{{0,1,0},{1,1,1},{0,1,0}});
 
@@ -26,6 +26,23 @@ public class SmartRodriguesConnectivity extends Filter {
      */
     public void setKernel(final Image kernel){
         this.kernel = kernel;
+    }
+
+    /**
+     * Sets the maximal error score that can be found before halting the filter.
+     * The error score is a sum of pixels below the threshold.
+     * @param maxErrorScore
+     */
+    public void setMaxErrorScore(final long maxErrorScore){
+        this.maxErrorScore = maxErrorScore;
+    }
+
+    /**
+     * Sets the maximal distance between disconnected pixels.
+     * @param maxDistance
+     */
+    public void setMaxDistance(final long maxDistance){
+        this.maxDistance = maxDistance;
     }
 
     @Override
