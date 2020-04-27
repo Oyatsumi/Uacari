@@ -296,6 +296,16 @@ public class ImageOperation {
 			}
 		return associatedImg;
 	}
+	public Image add(Image imgToSum){
+		for (int b=0; b<associatedImg.getNumBands(); b++){
+			for (int i=0; i<associatedImg.getHeight(); i++){
+				for (int j=0; j<associatedImg.getWidth(); j++){
+					associatedImg.setPixel(j, i, b, associatedImg.getPixel(j, i, b) + imgToSum.getPixel(j, i, b));
+				}
+			}
+		}
+		return associatedImg;
+	}
 
 	
 	

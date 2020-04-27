@@ -9,8 +9,8 @@ import image.Image;
  */
 public class SmartRodriguesConnectivity extends Filter {
     private double threshold = 0;
-    private long maxErrorScore = 100; //70
-    private double maxDistance = 3;
+    private long maxErrorScore = 1000; //100
+    private double maxDistance = 4;
     private Image kernel = new Image(new int[][]{{0,1,0},{1,1,1},{0,1,0}});
 
     /**
@@ -39,6 +39,7 @@ public class SmartRodriguesConnectivity extends Filter {
 
     /**
      * Sets the maximal distance between disconnected pixels.
+     * The higher the distance the larger the caliber of "vessel" pixels.
      * @param maxDistance
      */
     public void setMaxDistance(final long maxDistance){

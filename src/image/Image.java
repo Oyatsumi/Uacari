@@ -36,6 +36,7 @@ import static image.Image.BoundaryOperationType.*;
  */
 public class Image{
 	public static MorphologyConstants MorphologyConstants;
+	public static enum BoundaryOperationType{BOUNDARY_MODULE, BOUNDARY_REFLECT}
 
 	public static class InterpolationType{
 		public static final Object BICUBIC = RenderingHints.VALUE_INTERPOLATION_BICUBIC,
@@ -73,8 +74,7 @@ public class Image{
 	private int hashCodeShift = 0;
 	//
 	
-	public static enum BoundaryOperationType{BOUNDARY_MODULE, BOUNDARY_REFLECT}
-	
+
 	//auxiliary variables
 	
 	private void instantiateMorphology(){if (morphology == null) morphology = new Morphology(this);}
@@ -599,8 +599,8 @@ public class Image{
 	/**
 	 * Sets the boundary operation.
 	 * @param boundaryOperation -
-	 * {@link Image#BOUNDARY_MODULE} if we want to take the module of the coordinate in respect to the size of the image, or
-	 * {@link Image#BOUNDARY_REFLECT} if we want to take the reflect the pixels near the boundary.
+	 * {@link BoundaryOperationType#BOUNDARY_MODULE} if we want to take the module of the coordinate in respect to the size of the image, or
+	 * {@link BoundaryOperationType#BOUNDARY_REFLECT} if we want to take the reflect the pixels near the boundary.
 	 * @author �rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
 	public void setBoundaryOperation(final BoundaryOperationType boundaryOperation){
@@ -895,7 +895,6 @@ public class Image{
 	/**
 	 * Operates the image according to the operation in PixelOperation
 	 * @param pixelOperation
-	 * @param band
 	 * @return
 	 * @author �rick Oliveira Rodrigues (erickr@id.uff.br)
 	 */
@@ -1067,26 +1066,28 @@ public class Image{
 	}
 	
 	//
-	public void multiply(final float factor){for (int b=0; b<this.getNumBands(); b++) multiply(factor, b);}
-	public void multiply(final float factor, final int band){
+	public Image multiply(final float factor){for (int b=0; b<this.getNumBands(); b++) multiply(factor, b); return this;}
+	public Image multiply(final float factor, final int band){
 		for (int i=0; i<this.getHeight(); i++){
 			for (int j=0; j<this.getWidth(); j++){
 				this.setPixel(j, i, band, this.getPixel(j, i, band)*factor);
 			}
 		}
+		return this;
 	}
-	public void sum(final float parcel){for (int b=0; b<this.getNumBands(); b++) sum(parcel, b);}
-	public void sum(final float parcel, final int band){
+	public Image sum(final float parcel){for (int b=0; b<this.getNumBands(); b++) sum(parcel, b); return this;}
+	public Image sum(final float parcel, final int band){
 		for (int i=0; i<this.getHeight(); i++){
 			for (int j=0; j<this.getWidth(); j++){
 				this.setPixel(j, i, band, this.getPixel(j, i, band) + parcel);
 			}
 		}
+		return this;
 	}
-	public void subtract(final float parcel){sum(-parcel);}
-	public void subtract(final float parcel, final int band){sum(-parcel, band);}
-	public void divide(final float factor, final int band){multiply(1f/factor, band);}
-	public void divide(final float factor){multiply(1f/factor);}
+	public Image subtract(final float parcel){sum(-parcel); return this;}
+	public Image subtract(final float parcel, final int band){sum(-parcel, band); return this;}
+	public Image divide(final float factor, final int band){multiply(1f/factor, band); return this;}
+	public Image divide(final float factor){multiply(1f/factor); return this;}
 	
 	//transforms
 	private Vector auxVec1 = new Vector(0, 0), auxVec2 = new Vector(0, 0);
@@ -1107,7 +1108,6 @@ public class Image{
 	 * @param x
 	 * @param y
 	 * @param str
-	 * @param color
 	 * @return
 	 * @throws Exception
 	 */
@@ -1116,9 +1116,10 @@ public class Image{
 	public Image blendImages(Image topImg, int posX, int posY) throws Exception{op.blendImages(topImg, posX, posY); return this;}
 	public Image invert(){op.invert(); return this;}
 	public Image intersect(Image imgToIntersect){op.intersect(imgToIntersect); return this;}
-	public Image maskedImage(Image mask){op.getMaskedImage(mask); return this;}
+	public Image maskImage(Image mask){op.getMaskedImage(mask); return this;}
 	public Image addBrightness(int valueToAdd){op.addBrightness(valueToAdd); return this;}
 	public Image subtract(Image imgToSubtract){op.subtract(imgToSubtract); return this;}
+	public Image add(Image imgToSum){op.add(imgToSum); return this;}
 	public Image threshold(int thresholdLevel){op.threshold(thresholdLevel); return this;}
 	public Image threshold(int lowerThresholdLevel, int upperThresholdLevel){op.threshold(lowerThresholdLevel, upperThresholdLevel); return this;}
 	public Image smoothThreshold(int lowerThresholdLevel, int upperThresholdLevel){op.smoothThreshold(lowerThresholdLevel, upperThresholdLevel); return this;}
@@ -1126,7 +1127,7 @@ public class Image{
 	public Image antiAlias(){op.antiAlias(); return this;}
 	/**
 	 * Dilates the image based on the structuring element passed as parameter. You can create a new structuring element or use one of the Morphology class ({@link Morphology}). 
-	 * E.g., {@link Morphology.PRIMARY_STRUCT} for grey images, {@link Morphology.SIMPLE_BINARY_RECT} for binary images, etc.
+	 * E.g., {@link Morphology.STRUCT_PRIMARY} for grey images, {@link Morphology.SIMPLE_BINARY_RECT} for binary images, etc.
 	 * If the desired dilation is a binary dilation, do not forget to convert the image to binary first. Otherwise that could introduce problems related to the upper and lower limits of the image.
 	 * @param structuringElement - the structuring element
 	 * @param times - how many times the dilation will be performed
@@ -1137,7 +1138,7 @@ public class Image{
 	public Image dilate(Image structuringElement, int times, boolean contrast) {for (int k=0; k<times; k++) op.dilateOrErode(structuringElement, true); if(contrast) this.contrast(); return this;}
 	/**
 	 * Dilates the image based on the structuring element passed as parameter. You can create a new structuring element or use one of the Morphology class ({@link Morphology}).
-	 * E.g., {@link Morphology.PRIMARY_STRUCT} for grey images, {@link Morphology.SIMPLE_BINARY_RECT} for binary images, etc.
+	 * E.g., {@link Morphology.STRUCT_PRIMARY} for grey images, {@link Morphology.SIMPLE_BINARY_RECT} for binary images, etc.
 	 * If the desired dilation is a binary dilation, do not forget to convert the image to binary first. Otherwise that could introduce problems related to the upper and lower limits of the image.
 	 * @param structuringElement - the structuring element
 	 * @param times - how many times the dilation will be performed
@@ -1147,7 +1148,7 @@ public class Image{
 	public Image dilate(Image structuringElement, int times){return dilate(structuringElement, times, true);}
 	/**
 	 * Erodes the image based on the structuring element passed as parameter. You can create a new structuring element or use one of the Morphology class ({@link Morphology}). .
-	 * E.g., {@link Morphology.PRIMARY_STRUCT} for grey images, {@link Morphology.SIMPLE_BINARY_RECT} for binary images, etc.
+	 * E.g., {@link Morphology.STRUCT_PRIMARY} for grey images, {@link Morphology.SIMPLE_BINARY_RECT} for binary images, etc.
 	 * If the desired dilation is a binary dilation, do not forget to convert the image to binary first. Otherwise that could introduce problems related to the upper and lower limits of the image.
 	 * @param structuringElement - the structuring element
 	 * @param times - how many times the dilation will be performed
@@ -1157,7 +1158,7 @@ public class Image{
 	public Image erode(Image structuringElement, int times) {return erode(structuringElement, times, true);}
 	/**
 	 * Erodes the image based on the structuring element passed as parameter. You can create a new structuring element or use one of the Morphology class ({@link Morphology}). 
-	 * E.g., {@link Morphology.PRIMARY_STRUCT} for grey images, {@link Morphology.SIMPLE_BINARY_RECT} for binary images, etc.
+	 * E.g., {@link Morphology.STRUCT_PRIMARY} for grey images, {@link Morphology.SIMPLE_BINARY_RECT} for binary images, etc.
 	 * If the desired dilation is a binary dilation, do not forget to convert the image to binary first. Otherwise that could introduce problems related to the upper and lower limits of the image.
 	 * @param structuringElement - the structuring element
 	 * @param times - how many times the dilation will be performed
@@ -1170,18 +1171,21 @@ public class Image{
 	
 	
 	
-	public void showImage() throws Exception{
+	public Image showImage() throws Exception{
 		if (display == null) display = new ImageDisplay();
 		//if (this.hasBufferedImage()) createBufferedImage();
 		display.setImage(this);
+		return this;
 	}
-	public void showImage(ImageDisplay display) throws Exception{
+	public Image showImage(ImageDisplay display) throws Exception{
 		display.setImage(this);
+		return this;
 	}
-	public void showImage(String title) throws Exception{
+	public Image showImage(String title) throws Exception{
 		if (display == null) display = new ImageDisplay();
 		display.setTitle(title);
 		display.setImage(this);
+		return this;
 	}
 
 }

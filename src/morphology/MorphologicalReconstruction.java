@@ -6,7 +6,7 @@ import similarity.SimilarityMeasure;
 
 /**
  * Class to perform morphological reconstructions and clusterizations.
- * @author Érick Oliveira Rodrigues (erickr@id.uff.br)
+ * @author ï¿½rick Oliveira Rodrigues (erickr@id.uff.br)
  */
 public class MorphologicalReconstruction {
 	private Image mask = null, marker, structuringElement;
@@ -58,7 +58,7 @@ public class MorphologicalReconstruction {
 		do {
 			itImg2 = itImg.clone();
 			itImg.dilate(getStructuringElement(), 1);
-			itImg.maskedImage(mask);
+			itImg.maskImage(mask);
 			count ++;
 		}while(!itImg.equals(itImg2, SimilarityMeasure.MEAN_DIFFERENCE));
 		
