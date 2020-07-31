@@ -57,7 +57,7 @@ public class Image{
 	private List<TreeMap<Double, Integer>> intensities = null; //ascendingly ordered
 	//private int[][] pixelValue;
 	private PixelMap pixMap = null;
-	private BufferedImage bImg = null;
+	private BufferedImage bufferedImage = null;
 	private boolean updateBufferedImage = true, updateHistogram = true, updateMean = true;
 	//private boolean[][] binaryImgs;
 	private byte bands = 1;
@@ -87,7 +87,7 @@ public class Image{
 		this.type = img.getType();
 		this.bands = (byte) img.getNumBands();
 		updateBufferedImage = true; updateHistogram = true; updateMean = true;
-		display = null; morphology = null; bImg = null; intensities = null; minMax = null;
+		display = null; morphology = null; bufferedImage = null; intensities = null; minMax = null;
 		return this;
 	}
 	
@@ -167,7 +167,8 @@ public class Image{
 	public void updateImage(BufferedImage img, int width, int height) throws Exception{
 		if (width != this.getWidth() || height != this.getHeight()){
 			setImageFromBufferedImage(updateBufferedImage(width, height));
-		}else updateImage(img);
+		}else
+			updateImage(img);
 	}
 	public void updateImage(BufferedImage img){
 		//raster = img.getRaster();
@@ -220,28 +221,32 @@ public class Image{
 		if (this.getNumBands() == 4) type = BufferedImage.TYPE_INT_ARGB;
 
 		//check if binary
-		boolean isBinary = true;
-		double v1 = this.getPixel(0, 0, 0), v2 = v1;
-		Gray:
-		for (int i=0; i<height; i++){
-			for (int j=0; j<width; j++){
+		/*
+		boolean isBinary = false;
+		if (this.isGray()) {
+			isBinary = true;
+			double v1 = this.getPixel(0, 0, 0), v2 = v1;
+			Gray:
+			for (int i = 0; i < height; i++) {
+				for (int j = 0; j < width; j++) {
 					double v = this.getPixel(j, i, 0);
-					if (v != v1 && v != v2){
-						if (v1 != v2){
+					if (v != v1 && v != v2) {
+						if (v1 != v2) {
 							isBinary = false;
 							break Gray;
 						}
 						v2 = v;
 					}
 
+				}
 			}
+			if (isBinary) type = BufferedImage.TYPE_BYTE_BINARY;
 		}
-		if (isBinary) type = BufferedImage.TYPE_BYTE_BINARY;
-		final int MAX_V = isBinary ?  1 : 255;
+		final int MAX_V = isBinary ? 1 : 255;
+		*/
 
-
-		bImg = new BufferedImage(width, height, type);
-		WritableRaster raster = bImg.getRaster();
+		bufferedImage = new BufferedImage(width, height, type);
+		WritableRaster raster = bufferedImage.getRaster();
 
 
 		int pixelValue = 0;
@@ -250,7 +255,7 @@ public class Image{
 			for (int j=0; j<width; j++){
 				for (int b=0; b<this.getNumBands() && b<raster.getNumBands(); b++){
 					pixelValue = (int) this.getPixel(j, i, b);
-					if (pixelValue < 0) pixelValue = 0; if (pixelValue > MAX_V) pixelValue = MAX_V;
+					//if (pixelValue < 0) pixelValue = 0; if (pixelValue > MAX_V) pixelValue = MAX_V;
 					raster.setSample(j, i, b, pixelValue);
 				}
 			}
@@ -258,7 +263,7 @@ public class Image{
 
 		this.setToUpdateBuffers();
 		this.updateBufferedImage = false;
-		return bImg;
+		return bufferedImage;
 	}
 	
 	public void showHistogram() throws Exception{
@@ -423,10 +428,10 @@ public class Image{
 	 * @throws Exception
 	 */
 	public BufferedImage getBufferedImage() {
-		if (!this.updateBufferedImage) return this.bImg;
+		if (!this.updateBufferedImage) return this.bufferedImage;
 
-		this.bImg = updateBufferedImage();
-		return this.bImg;
+		this.bufferedImage = updateBufferedImage();
+		return this.bufferedImage;
 	}
 	public int getType(){
 		if (type == -1)
@@ -564,7 +569,96 @@ public class Image{
 		}
 		return this;
 	}
-	
+
+
+	/**
+	 * Reduces the background of the image iteratively
+	 * @param backgroundValue
+	 */
+	public void reduceBackground(final int backgroundValue){
+		double currentNotBackground = this.countValue(backgroundValue, true);
+		double newNotBackground = currentNotBackground;
+
+		while(newNotBackground == currentNotBackground) {
+			double currentBackground = this.countValue(backgroundValue);
+			double newBackground = currentBackground;
+
+			//top left
+			Image img = this.clone();
+			img.subImage(1, 1, this.getWidth()-1, this.getHeight()-1);
+			newBackground = img.countValue(backgroundValue);
+			newNotBackground = img.countValue(backgroundValue, true);
+
+
+			if (newBackground < currentBackground && newNotBackground == currentNotBackground) {
+				this.subImage(1, 1, this.getWidth()-1, this.getHeight()-1);
+			}
+
+			//bottom right
+			img = this.clone();
+			img.subImage(0, 0, this.getWidth() - 1, this.getHeight() - 1);
+			newBackground = img.countValue(backgroundValue);
+			newNotBackground = img.countValue(backgroundValue, true);
+
+			if (newBackground < currentBackground && newNotBackground == currentNotBackground) {
+				this.subImage(0, 0, this.getWidth() - 1, this.getHeight() - 1);
+			}
+
+		}
+
+	}
+
+
+	/**
+	 * Counts the amount of occurrences of value in band
+	 * @param value
+	 * @param band
+	 * @param otherThan - true if it is to count the amount of values other than the one passed as parameter
+	 * @return
+	 */
+	public double countValue(final double value, final int band, boolean otherThan){
+		double counter = 0;
+		for (int i=0; i<this.getHeight(); i++){
+			for (int j=0; j<this.getWidth(); j++){
+				if (!otherThan){
+					if (this.getPixel(j, i, band) == value)
+						counter++;
+				}else{
+					if (this.getPixel(j, i, band) != value)
+						counter++;
+				}
+			}
+		}
+		return counter;
+	}
+
+	/**
+	 * Counts the amount of occurrences of value in band
+	 * @param value
+	 * @return
+	 */
+	public double countValue(final double value, final int band){
+		return countValue(value, band, false);
+	}
+
+	public double countValue(final double value, final boolean otherThan){
+		double counter = 0;
+		for (int b=0; b<this.getNumBands(); b++)
+			counter += countValue(value, b, otherThan);
+		return counter;
+	}
+
+	/**
+	 * Counts the amount of occurrences of value in all bands
+	 * @param value
+	 * @return
+	 */
+	public double countValue(final double value){
+		double counter = 0;
+		for (int b=0; b<this.getNumBands(); b++)
+			counter += countValue(value, b);
+		return counter;
+	}
 	
 	public int hashCode(){
 		if (updateHashCode){
@@ -722,34 +816,26 @@ public class Image{
 	public void setImageFromBufferedImage(BufferedImage img){
 		if (pixMap != null) pixMap.dispose();
 
-		
+		if (img.getType() == BufferedImage.TYPE_BYTE_INDEXED) {
+			BufferedImage rgb = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+			rgb.createGraphics().drawImage(img, 0, 0, null);
+			img = rgb;
+		}
+
 		//update objects
 		this.setToUpdateBuffers(); this.updateBufferedImage = false;
-		this.bImg = img;
+		this.bufferedImage = img;
 		this.type = img.getType();
 		
-		WritableRaster raster = img.getRaster();	
-		boolean grey = true;
-		for (int i=0; i<img.getHeight() && raster.getNumBands() >= 1; i++){
-			for (int j=0; j<img.getWidth(); j++){
-				for (int b=1; b<raster.getNumBands(); b++) {
-					grey &= raster.getSample(j, i, b) == raster.getSample(j, i, b-1);
-				}
-			}
-		}
-		
-		if (!grey)
-			pixMap = new PixelMap(img.getWidth(), img.getHeight(), raster.getNumBands(), 8, false);
-		else
-			pixMap = new PixelMap(img.getWidth(), img.getHeight(), 1, 8, false);
-		
-		if (!grey) this.bands = (byte) raster.getNumBands();
-		else this.bands = 1;
-		
+		WritableRaster raster = img.getRaster();
+		this.bands = (byte) raster.getNumBands();
+		pixMap = new PixelMap(img.getWidth(), img.getHeight(), raster.getNumBands(), 8, false);
+
+
 		//fill the image
 		for (int i=0; i<img.getHeight(); i++) {
 			for (int j=0; j<img.getWidth(); j++) {
-				for (int b=0; b<this.bands; b++) {
+				for (int b=0; b<raster.getNumBands(); b++) {
 					this.pixMap.set(j, i, b, raster.getSample(j, i, b));
 				}
 			}
@@ -772,11 +858,11 @@ public class Image{
 	public boolean isBinary(){return this.getBitDepth() == 1;}
 	
 	//has
-	public boolean hasBufferedImage(){return this.bImg != null;}
+	public boolean hasBufferedImage(){return this.bufferedImage != null;}
 	
 	//others
 	public void dispose(){if (this.intensities != null) this.intensities.clear(); this.intensities = null; this.pixMap = null;}
-	public void disposeBufferedImage(){this.bImg = null;}
+	public void disposeBufferedImage(){this.bufferedImage = null;}
 	
 	
 	public Image clone() {
@@ -995,6 +1081,7 @@ public class Image{
 			for (int j=0; j<width; j++)
 				for (int b=0; b<out.getNumBands(); b++)
 					out.setPixel(j, i, b, this.getPixel(j + x, i + y, b));
+
 		this.set(out);
 		return this;
 	}

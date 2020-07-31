@@ -1,10 +1,6 @@
 package image;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -69,6 +65,7 @@ public class ImageDisplay extends JFrame{
 
 		Panel(ImageDisplay frame) {
 			this.frame = frame;
+			this.setOpaque(false);
 
 
 			//mouse click
@@ -81,12 +78,16 @@ public class ImageDisplay extends JFrame{
 					JFrame parentFrame = new JFrame();
 
 					JFileChooser fileChooser = new JFileChooser();
-					fileChooser.setDialogTitle("SAVE AS: Choose an image name and path");
+					fileChooser.setDialogTitle("SAVE AS: Choose an image name and path (including extension)");
 
 
 					int userSelection = fileChooser.showSaveDialog(parentFrame);
 					try {
-						image.exportImage(fileChooser.getSelectedFile().getPath());
+						String p = fileChooser.getSelectedFile().getPath();
+						if (!p.contains("."))
+							p += ".png";
+
+						image.exportImage(p);
 					} catch (Exception ex) {
 						//ex.printStackTrace();
 						System.out.println("Image has not been saved...");

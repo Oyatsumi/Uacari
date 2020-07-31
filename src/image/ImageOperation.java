@@ -77,7 +77,7 @@ public class ImageOperation {
 	    return outBuffImg;
 	}
 	public BufferedImage scale(double x, double y) throws Exception{
-		outBuffImg = new BufferedImage((int)(associatedImg.getWidth()*x), (int)(associatedImg.getHeight()*y), associatedImg.getType());
+		outBuffImg = new BufferedImage((int)Math.ceil(associatedImg.getWidth()*x), (int)Math.ceil(associatedImg.getHeight()*y), associatedImg.getType());
 		g2d = outBuffImg.createGraphics();
 		setRenderingKeys(g2d);
 		g2d.scale(x, y);
