@@ -20,7 +20,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.filechooser.FileSystemView;
 
 import filters.Filter;
@@ -36,7 +41,7 @@ import static image.Image.BoundaryOperationType.*;
  */
 public class Image{
 	public static MorphologyConstants MorphologyConstants;
-	public static enum BoundaryOperationType{BOUNDARY_MODULE, BOUNDARY_REFLECT}
+	public static enum BoundaryOperationType{BOUNDARY_MODULE, BOUNDARY_REFLECT, BOUNDARY_AVERAGE}
 
 	public static class InterpolationType{
 		public static final Object BICUBIC = RenderingHints.VALUE_INTERPOLATION_BICUBIC,
@@ -73,7 +78,6 @@ public class Image{
 	private boolean updateHashCode = false;
 	private int hashCodeShift = 0;
 	//
-	
 
 	//auxiliary variables
 	
@@ -352,10 +356,13 @@ public class Image{
 	 */
 	public double getPixelBoundaryMode(int x, int y, int band){
 		final int WIDTH = this.getWidth(), HEIGHT = this.getHeight();
+		if (band >= this.getNumBands()) return 0;
 		if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT){
 			if (this.backgroundColor != null){
 				return this.backgroundColor[band];
 			}else{
+				if (this.getBoundaryOperation() == BOUNDARY_AVERAGE) return this.getAverageIntensity(band);
+
 				int nX = 0, nY = 0;
 				if (x < 0){
 					switch(this.getBoundaryOperation()){
@@ -481,7 +488,7 @@ public class Image{
 	private int getAssociatedType(int numBands){return (numBands == 1) ? BufferedImage.TYPE_BYTE_GRAY : (numBands == 3) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;}
 	double meanIntensity = 0;
 	byte meanBandBuffer = 0;
-	public double getMeanIntensity(int band){
+	public double getAverageIntensity(int band){
 		if (!this.updateMean && meanBandBuffer == band) 
 			return meanIntensity;
 		
@@ -673,6 +680,11 @@ public class Image{
 	
 	
 	//set
+	public Image setTitle(final String title){
+		if (display == null) display = new ImageDisplay();
+		this.display.setTitle(title);
+		return this;
+	}
 	public void setSize(final int width, final int height){
 		Image nImg = new Image(width, height, this.getNumBands(), this.getBitDepth(), this.containsFloatValues());
 		for (int b=0; b<this.getNumBands(); b++){
@@ -842,15 +854,99 @@ public class Image{
 		}
 		
 	}
-	
-	public void setBackgroundColor(double[] bgColor){this.backgroundColor = bgColor;}
+
+	/**
+	 * Paints the background of the image given an alpha threshold
+	 * @param bgColor
+	 * @param alphaThreshold
+	 * @return
+	 */
+	public Image paintBackground(final double[] bgColor, float alphaThreshold){
+		if (this.getNumBands() < 4) return this;
+
+		for (int i=0; i<this.getHeight(); i++){
+			for (int j=0; j<this.getWidth(); j++){
+
+				if (this.getPixel(j, i, 3) <= alphaThreshold){
+					this.setPixel(j, i, 0, bgColor[0]);
+					this.setPixel(j, i, 1, bgColor[1]);
+					this.setPixel(j, i, 2, bgColor[2]);
+					if (bgColor.length == 4) this.setPixel(j, i, 3, bgColor[3]);
+				}
+
+			}
+		}
+		return this;
+	}
+
+	public void setBackgroundColor(final double[] bgColor){this.backgroundColor = bgColor;}
 	public void setBackgroundColor(double value, int numOfBands){
 		this.backgroundColor = new double[numOfBands];
 		for (int k=0; k<numOfBands; k++){
 			this.backgroundColor[k] = value;
 		}
 	}
-	
+
+	/**
+	 * Transforms this image in a cropped image, starting at position (x, y), with width and height as set in the parameters.
+	 * This method also centers the content of the image.
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	public Image setCanvas(int x, int y, int width, int height){
+		return this.setCanvas(x, y,  width, height, 0, 0);
+	}
+
+	/**
+	 * Transforms this image in a cropped image, starting at position (x, y), with width and height as set in the parameters.
+	 * This method also centers the content of the image.
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	public Image setCanvas(int width, int height){
+		return this.setCanvas(0,0,width,height);
+	}
+
+	/**
+	 * Transforms this image in a cropped image, starting at position (x, y), with width and height as set in the parameters.
+	 * This method also centers the content of the image.
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param xShift - shifts the content of the image (x axis)
+	 * @param yShift - shifts the content of the image (y axis)
+	 * @return
+	 */
+	public Image setCanvas(int x, int y, int width, int height, int xShift, int yShift){
+		int displaceY = (this.getHeight() - height)/2, displaceX = (this.getWidth() - width)/2;
+		subImage(x, y, displaceX + xShift, displaceY + yShift, width, height);
+		return this;
+	}
+
+
+	/**
+	 * Transforms this image in a cropped image, starting at position (x, y), with width and height as set in the parameters.
+	 * This method also centers the content of the image.
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param centroidX - this is the x point that will be centered in the new canvas resolution
+	 * @param centroidY - this is the y point that will be centered in the new canvas resolution
+	 * @return
+	 */
+	public Image setCanvas(int x, int y, int width, int height, float centroidX, float centroidY){
+		int displaceY = (this.getHeight() - height)/2, displaceX = (this.getWidth() - width)/2;
+		displaceX += centroidX -this.getWidth()/2; displaceY += centroidY - this.getHeight()/2;
+
+		subImage(x, y, displaceX, displaceY, width, height);
+		return this;
+	}
 
 	
 	//is
@@ -922,6 +1018,26 @@ public class Image{
 	 */
 	public void exportImage(String outputPath, String formatName) throws Exception{
 		ImageIO.write(this.getBufferedImage(), formatName.toUpperCase(), new File(outputPath));
+	}
+
+
+	/**
+	 * Saves a JPG compressed image
+	 * @param outputPath - the output path of the image
+	 * @param compresisonQuality - compression quality (0 worst, 1 best)
+	 * @throws Exception
+	 */
+	public void exportCompressedImage(String outputPath, final float compresisonQuality) throws Exception{
+		JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+		jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+		jpegParams.setCompressionQuality(compresisonQuality);
+		final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+		// specifies where the jpg image has to be written
+		writer.setOutput(new FileImageOutputStream(
+				new File(outputPath)));
+		// writes the file with given compression level
+		// from your JPEGImageWriteParam instance
+		writer.write(null, new IIOImage(this.getBufferedImage(), null, null), jpegParams);
 	}
 	
 	/**
@@ -1067,7 +1183,27 @@ public class Image{
 	}
 	
 	/**
-	 * Transforms this image in a subimage, starting at position (x, y), with width and height as set in the parameters.
+	 * Transforms this image in a cropped image, starting at position (x, y), with width and height as set in the parameters.
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	public Image subImage(int x, int y, int xShift, int yShift, int width, int height){
+		//if (width > this.getWidth() - x) width = this.getWidth() - x; if (height > this.getHeight() - y) height = this.getHeight() - y;
+		Image out = new Image(width, height, this.getNumBands(), this.getBitDepth(), this.containsFloatValues());
+		for (int i=0; i<height; i++)
+			for (int j=0; j<width; j++)
+				for (int b=0; b<out.getNumBands(); b++)
+					out.setPixel(j, i, b, this.getPixelBoundaryMode(j + x + xShift, i + y + yShift, b));
+
+		this.set(out);
+		return this;
+	}
+
+	/**
+	 * Transforms this image in a cropped image, starting at position (x, y), with width and height as set in the parameters.
 	 * @param x
 	 * @param y
 	 * @param width
@@ -1075,15 +1211,7 @@ public class Image{
 	 * @return
 	 */
 	public Image subImage(int x, int y, int width, int height){
-		if (width > this.getWidth() - x) width = this.getWidth() - x; if (height > this.getHeight() - y) height = this.getHeight() - y;
-		Image out = new Image(width, height, this.getNumBands(), this.getBitDepth(), this.containsFloatValues());
-		for (int i=0; i<height; i++)
-			for (int j=0; j<width; j++)
-				for (int b=0; b<out.getNumBands(); b++)
-					out.setPixel(j, i, b, this.getPixel(j + x, i + y, b));
-
-		this.set(out);
-		return this;
+		return subImage(x, y, 0, 0, width, height);
 	}
 	
 	public Image insertImage(Image imageToInsert, final int x, final int y){

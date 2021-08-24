@@ -34,8 +34,8 @@ public class NormalizedCrossCorrelation extends SimilarityMeasure{
 			double result = 0;
 			
 			for (int b=bandI; b<bandF; b++){
-				img1MeanIntensity = img1.getMeanIntensity(b);
-				img2MeanIntensity = img2.getMeanIntensity(b);
+				img1MeanIntensity = img1.getAverageIntensity(b);
+				img2MeanIntensity = img2.getAverageIntensity(b);
 				for (int i=0; i<height; i++){
 					for (int j=0; j<width; j++){
 						numerator += (img1.getPixel(j, i, b)-img1MeanIntensity)*(img2.getPixel(j, i, b)-img2MeanIntensity);
@@ -54,8 +54,8 @@ public class NormalizedCrossCorrelation extends SimilarityMeasure{
 			BigDecimal result = BigDecimal.valueOf(0);
 			
 			for (int b=0; b<bandF; b++){
-				img1MeanIntensity = img1.getMeanIntensity(b);
-				img2MeanIntensity = img2.getMeanIntensity(b);
+				img1MeanIntensity = img1.getAverageIntensity(b);
+				img2MeanIntensity = img2.getAverageIntensity(b);
 				for (int i=0; i<height; i++){
 					for (int j=0; j<width; j++){
 						numerator = numerator.add(BigDecimal.valueOf((img1.getPixel(j, i, b)-img1MeanIntensity)*(img2.getPixel(j, i, b)-img2MeanIntensity)));

@@ -9,7 +9,7 @@ import image.Image;
  */
 public class Connectivity extends Filter {
     private double threshold = 0;
-    private Image kernel = new Image(new int[][]{{0,1,0},{1,1,1},{0,1,0}});
+    private Image kernel = new Image(new int[][]{{0,1,0},{1,0,1},{0,1,0}});
 
     /**
      * Sets the threshold to consider a pixel for "counting" the connectivity. Standard threshold is 0. If > 0 then it is a pixel to keep counting the connectivity.
@@ -52,6 +52,8 @@ public class Connectivity extends Filter {
             for (int j=0; j<kernel.getWidth(); j++){
                 int posX = -midX + x + j,
                         posY = -midY + y + i;
+
+                if (posX == x && posY == y) continue;
 
                 if (kernel.getPixel(j, i) > 0)
                     checkPixel(image, posX, posY, band, visitMap, score);

@@ -11,7 +11,7 @@ import image.Image;
  */
 public class FrangiFilter extends Filter{
 	
-	private float beta1 = 2f, beta2 = 1f;
+	private float beta1 = 1f, beta2 = 2f;
 	private float sigmaMin = 1, sigmaMax = 1, sigmaStep = 1;
 	private boolean blackWhite = true;
 	
@@ -40,11 +40,16 @@ public class FrangiFilter extends Filter{
 	public void setMinSigma(final float sigmaStart){
 		this.sigmaMin = sigmaStart;
 	}
-	public void setMaxSigma(final float sigmaEnd){
-		this.sigmaMax = sigmaEnd;
+	public void setMaxSigma(final float sigmaStop){
+		this.sigmaMax = sigmaStop;
 	}
 	public void setSigmaStep(final float sigmaStep){
 		this.sigmaStep = sigmaStep;
+	}
+
+	public void setMinMaxSigma(final float sigmaStart, final float sigmaStop){
+		this.setMinSigma(sigmaStart);
+		this.setMaxSigma(sigmaStop);
 	}
 
 	private int lastBand = -1;
